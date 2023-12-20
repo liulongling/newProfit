@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.profit.bond.mapper.BondInfoMapper">
+
+	<resultMap type="BondInfo" id="BondInfoResult">
+		<result property="id"    column="id"    />
+		<result property="name"    column="name"    />
+		<result property="price"    column="price"    />
+		<result property="oldPrice"    column="old_price"    />
+		<result property="plate"    column="plate"    />
+		<result property="isEtf"    column="is_etf"    />
+		<result property="position"    column="position"    />
+		<result property="status"    column="status"    />
+		<result property="createTime"    column="create_time"    />
+		<result property="updateTime"    column="update_time"    />
+	</resultMap>
+
+	<sql id="selectBondInfoVo">
+		select id, name, price, old_price, plate, is_etf, position, status, create_time, update_time from bond_info
+	</sql>
+
+	<select id="selectBondInfoList" parameterType="BondInfo" resultMap="BondInfoResult">
+		<include refid="selectBondInfoVo"/>
+		<where>
+			<if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+			<if test="price != null  and price != ''"> and price = #{price}</if>
+			<if test="oldPrice != null  and oldPrice != ''"> and old_price = #{oldPrice}</if>
+			<if test="plate != null  and plate != ''"> and plate = #{plate}</if>
+			<if test="isEtf != null "> and is_etf = #{isEtf}</if>
+			<if test="position != null "> and position = #{position}</if>
+			<if test="status != null "> and status = #{status}</if>
+		</where>
+	</select>
+
+	<select id="selectBondInfoById" parameterType="String" resultMap="BondInfoResult">
+		<include refid="selectBondInfoVo"/>
+		where id = #{id}
+	</select>
+
+	<insert id="insertBondInfo" parameterType="BondInfo">
+		insert into bond_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">id,</if>
+			<if test="name != null and name != ''">name,</if>
+			<if test="price != null and price != ''">price,</if>
+			<if test="oldPrice != null">old_price,</if>
+			<if test="plate != null and plate != ''">plate,</if>
+			<if test="isEtf != null">is_etf,</if>
+			<if test="position != null">position,</if>
+			<if test="status != null">status,</if>
+			<if test="createTime != null">create_time,</if>
+			<if test="updateTime != null">update_time,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">#{id},</if>
+			<if test="name != null and name != ''">#{name},</if>
+			<if test="price != null and price != ''">#{price},</if>
+			<if test="oldPrice != null">#{oldPrice},</if>
+			<if test="plate != null and plate != ''">#{plate},</if>
+			<if test="isEtf != null">#{isEtf},</if>
+			<if test="position != null">#{position},</if>
+			<if test="status != null">#{status},</if>
+			<if test="createTime != null">#{createTime},</if>
+			<if test="updateTime != null">#{updateTime},</if>
+		</trim>
+	</insert>
+
+	<update id="updateBondInfo" parameterType="BondInfo">
+		update bond_info
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="name != null and name != ''">name = #{name},</if>
+			<if test="price != null and price != ''">price = #{price},</if>
+			<if test="oldPrice != null">old_price = #{oldPrice},</if>
+			<if test="plate != null and plate != ''">plate = #{plate},</if>
+			<if test="isEtf != null">is_etf = #{isEtf},</if>
+			<if test="position != null">position = #{position},</if>
+			<if test="status != null">status = #{status},</if>
+			<if test="createTime != null">create_time = #{createTime},</if>
+			<if test="updateTime != null">update_time = #{updateTime},</if>
+		</trim>
+		where id = #{id}
+	</update>
+
+	<delete id="deleteBondInfoById" parameterType="String">
+		delete from bond_info where id = #{id}
+	</delete>
+
+	<delete id="deleteBondInfoByIds" parameterType="String">
+		delete from bond_info where id in
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

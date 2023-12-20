@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.profit.bond.mapper.BondStatisticsMapper">
+
+	<resultMap type="BondStatistics" id="BondStatisticsResult">
+		<result property="id"    column="id"    />
+		<result property="stock"    column="stock"    />
+		<result property="ready"    column="ready"    />
+		<result property="freeze"    column="freeze"    />
+		<result property="position"    column="position"    />
+		<result property="profitNumber"    column="profit_number"    />
+		<result property="lossNumber"    column="loss_number"    />
+		<result property="winning"    column="winning"    />
+		<result property="profit"    column="profit"    />
+		<result property="buyMoney"    column="buy_money"    />
+		<result property="sellMoney"    column="sell_money"    />
+		<result property="lossMoney"    column="loss_money"    />
+		<result property="cost"    column="cost"    />
+		<result property="updateTime"    column="update_time"    />
+	</resultMap>
+
+	<sql id="selectBondStatisticsVo">
+		select id, stock, ready, freeze, position, profit_number, loss_number, winning, profit, buy_money, sell_money, loss_money, cost, update_time from bond_statistics
+	</sql>
+
+	<select id="selectBondStatisticsList" parameterType="BondStatistics" resultMap="BondStatisticsResult">
+		<include refid="selectBondStatisticsVo"/>
+		<where>
+			<if test="stock != null "> and stock = #{stock}</if>
+			<if test="ready != null "> and ready = #{ready}</if>
+			<if test="freeze != null "> and freeze = #{freeze}</if>
+			<if test="position != null "> and position = #{position}</if>
+			<if test="profitNumber != null "> and profit_number = #{profitNumber}</if>
+			<if test="lossNumber != null "> and loss_number = #{lossNumber}</if>
+			<if test="winning != null  and winning != ''"> and winning = #{winning}</if>
+			<if test="profit != null "> and profit = #{profit}</if>
+			<if test="buyMoney != null "> and buy_money = #{buyMoney}</if>
+			<if test="sellMoney != null "> and sell_money = #{sellMoney}</if>
+			<if test="lossMoney != null "> and loss_money = #{lossMoney}</if>
+			<if test="cost != null "> and cost = #{cost}</if>
+		</where>
+	</select>
+
+	<select id="selectBondStatisticsById" parameterType="Long" resultMap="BondStatisticsResult">
+		<include refid="selectBondStatisticsVo"/>
+		where id = #{id}
+	</select>
+
+	<insert id="insertBondStatistics" parameterType="BondStatistics">
+		insert into bond_statistics
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">id,</if>
+			<if test="stock != null">stock,</if>
+			<if test="ready != null">ready,</if>
+			<if test="freeze != null">freeze,</if>
+			<if test="position != null">position,</if>
+			<if test="profitNumber != null">profit_number,</if>
+			<if test="lossNumber != null">loss_number,</if>
+			<if test="winning != null">winning,</if>
+			<if test="profit != null">profit,</if>
+			<if test="buyMoney != null">buy_money,</if>
+			<if test="sellMoney != null">sell_money,</if>
+			<if test="lossMoney != null">loss_money,</if>
+			<if test="cost != null">cost,</if>
+			<if test="updateTime != null">update_time,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">#{id},</if>
+			<if test="stock != null">#{stock},</if>
+			<if test="ready != null">#{ready},</if>
+			<if test="freeze != null">#{freeze},</if>
+			<if test="position != null">#{position},</if>
+			<if test="profitNumber != null">#{profitNumber},</if>
+			<if test="lossNumber != null">#{lossNumber},</if>
+			<if test="winning != null">#{winning},</if>
+			<if test="profit != null">#{profit},</if>
+			<if test="buyMoney != null">#{buyMoney},</if>
+			<if test="sellMoney != null">#{sellMoney},</if>
+			<if test="lossMoney != null">#{lossMoney},</if>
+			<if test="cost != null">#{cost},</if>
+			<if test="updateTime != null">#{updateTime},</if>
+		</trim>
+	</insert>
+
+	<update id="updateBondStatistics" parameterType="BondStatistics">
+		update bond_statistics
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="stock != null">stock = #{stock},</if>
+			<if test="ready != null">ready = #{ready},</if>
+			<if test="freeze != null">freeze = #{freeze},</if>
+			<if test="position != null">position = #{position},</if>
+			<if test="profitNumber != null">profit_number = #{profitNumber},</if>
+			<if test="lossNumber != null">loss_number = #{lossNumber},</if>
+			<if test="winning != null">winning = #{winning},</if>
+			<if test="profit != null">profit = #{profit},</if>
+			<if test="buyMoney != null">buy_money = #{buyMoney},</if>
+			<if test="sellMoney != null">sell_money = #{sellMoney},</if>
+			<if test="lossMoney != null">loss_money = #{lossMoney},</if>
+			<if test="cost != null">cost = #{cost},</if>
+			<if test="updateTime != null">update_time = #{updateTime},</if>
+		</trim>
+		where id = #{id}
+	</update>
+
+	<delete id="deleteBondStatisticsById" parameterType="Long">
+		delete from bond_statistics where id = #{id}
+	</delete>
+
+	<delete id="deleteBondStatisticsByIds" parameterType="String">
+		delete from bond_statistics where id in
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

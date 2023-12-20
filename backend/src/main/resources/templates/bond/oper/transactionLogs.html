@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title id="title"></title>
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="../../static/css/lib/bootstrap3.4.1.min.css"
+          th:href="@{/css/lib/bootstrap3.4.1.min.css}">
+    <!-- Bootstrap-table CSS-->
+    <link rel="stylesheet" href="../../static/css/lib/bootstrap-table.min.css"
+          th:href="@{/css/lib/bootstrap-table.min.css}">
+    <!-- jquery-ui CSS-->
+    <link rel="stylesheet" href="../../static/css/lib/jquery-ui.min.css" th:href="@{/css/lib/jquery-ui.min.css}">
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" href="../../static/css/table.css" th:href="@{/css/table.css}">
+</head>
+
+<body onload="init();">
+
+<div class="container" style="width: 2000px;" align="center">
+    <div class="panel-body">
+        <table id="bondInfo" class="table table-striped table-hover table-bordered"></table>
+    </div>
+</div>
+
+<div class="panel-body" style="padding-bottom:0;">
+    <div class="panel panel-default">
+        <ul id="myTab" class="nav nav-tabs">
+            <li><a href="#ios" data-toggle="tab" onclick="init();">全部</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter();">短线</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_wg();">长线</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_sell();">已出售(全部)</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell();">未出售(全部)</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_gird();">未出售(长线)</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_stu();">未出售(短线)</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_no_sell_flow();">未出售(超短)</a></li>
+            <li><a href="#ios" data-toggle="tab" onclick="filter_wait_buy();">待买入</a></li>
+        </ul>
+    </div>
+
+    <div id="toolbar" class="btn-group">
+        <button id="btn_add" type="button" class="btn btn-default" data-toggle="modal" data-target="#addModal"
+                onclick="addBond()">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true">买入股票</span>
+        </button>
+        <button id="btn_add_buy_sell" type="button" class="btn btn-default" data-toggle="modal"
+                data-target="#addBuySellModal" onclick="addBondBuySell()">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true">买入卖出股票</span>
+        </button>
+    </div>
+    <table id="table"></table>
+</div>
+
+<!-- 模态框（Modal） 新增 -->
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title text-center" id="addModalLabel">
+                    买入股票
+                </h2>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" onsubmit="return false;">
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_price">购买价格</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="insert_input_price">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_count">购买数量</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="insert_input_count" title="不能为空">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_buy_date">购买日期</label>
+                        <div class="col-sm-10">
+                            <input type="date" class="form-control" id="insert_input_buy_date" title="不能为空">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_type">类型</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="insert_input_type">
+                                <option value="1">短线</option>
+                                <option value="0">长线</option>
+                                <option value="2">超短</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_financing">货币</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="insert_input_financing">
+                                <option value="0">现金</option>
+                                <option value="1">融资</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_status">状态</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="insert_input_status">
+                                <option value="0">未出售</option>
+                                <option value="1">已出售</option>
+                                <option value="3">待买入</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_count">备注</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="insert_input_remarks" title="不能为空">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="insert();">添加</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<!-- 模态框（Modal） 新增 -->
+<div class="modal fade" id="addBuySellModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title text-center" id="addBuySellModalLabel">
+                    买入股票
+                </h2>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" onsubmit="return false;">
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_buy_price">购买价格</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="insert_input_buy_price">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_count">购买数量</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="insert_input_buy_count" title="不能为空">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_bond_buy_date">购买日期</label>
+                        <div class="col-sm-10">
+                            <input type="date" class="form-control" id="insert_input_bond_buy_date" title="不能为空">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_type">股票类型</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="insert_input_bond_type">
+                                <option value="1">短线</option>
+                                <option value="0">长线</option>
+                                <option value="2">超短</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_sell_price">出售价格</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="insert_input_sell_price">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_bond_sell_date">出售日期</label>
+                        <div class="col-sm-10">
+                            <input type="date" class="form-control" id="insert_input_bond_sell_date" title="不能为空">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="buyAndSell();">添加</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--模态框（Modal） 编辑-->
+<div class="modal fade" id="alterModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title text-center" id="alterModalLabel">
+                    编辑股票信息
+                </h2>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" onsubmit="return false;">
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="alert_input_id">序号</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="alert_input_id" readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_type">类型</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="alert_input_type">
+                                <option value="0">长线</option>
+                                <option value="1">短线</option>
+                                <option value="2">超短</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="insert_input_financing">货币</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="alert_input_financing">
+                                <option value="0">现金</option>
+                                <option value="1">融资</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="alert_input_count">购买数量</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="alert_input_count">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="alert_input_buy_date">购买日期</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="alert_input_buy_date">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="alert_input_price">购买价格</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="alert_input_price">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="alert_input_status">状态</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="alert_input_status">
+                                <option value="0">未出售</option>
+                                <option value="1">已出售</option>
+                                <option value="3">待买入</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="alert_input_remarks">备注</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="alert_input_remarks" title="不能为空">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="alter()">编辑</button>
+            </div>
+        </div> <!--/.modal-content -->
+    </div><!--/.modal-->
+</div>
+
+<!--模态框（Modal） 出售-->
+<div class="modal fade" id="sellModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title text-center" id="sellModalLabel">
+                    出售股票
+                </h2>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" onsubmit="return false;">
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="sell_buy_id">序号</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="sell_buy_id" readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="sell_gp_id">股票代码</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="sell_gp_id" readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="sell_input_price">出售价格</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="sell_input_price">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="sell_input_count">出售数量</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="sell_input_count">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="sell_input_freeze">预冻资金</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="sell_input_freeze">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="sell_input_interest">利息</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="sell_input_interest">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="sell_input_date">出售日期</label>
+                        <div class="col-sm-10">
+                            <input type="date" class="form-control" id="sell_input_date">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="sellSave()">出售</button>
+            </div>
+        </div> <!--/.modal-content -->
+    </div><!--/.modal-->
+</div>
+
+<!--模态框（Modal） 归还融资-->
+<div class="modal fade" id="backModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title text-center" id="backModalLabel">
+                    出售股票
+                </h2>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" onsubmit="return false;">
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="back_buy_id">序号</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="back_buy_id" readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="back_gp_id">股票代码</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="back_gp_id" readonly="readonly">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="back_input_money">归还金额</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="back_input_money">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="back_input_interest">利息</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" id="back_input_interest">
+                        </div>
+                    </div>
+
+                    <div class="form-group has-success">
+                        <label class="col-sm-2 control-label label-font" for="back_input_date">归还日期</label>
+                        <div class="col-sm-10">
+                            <input type="date" class="form-control" id="back_input_date">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="backCommit()">归还融资</button>
+            </div>
+        </div> <!--/.modal-content -->
+    </div><!--/.modal-->
+</div>
+
+<!-- JavaScript files-->
+<!-- jquery.js -->
+<script src="../../static/js/lib/jquery.min.js" th:src="@{/js/lib/jquery.min.js}"></script>
+<!-- Bootstrap.js -->
+<script src="../../static/js/lib/bootstrap3.4.1.min.js" th:src="@{/js/lib/bootstrap3.4.1.min.js}"></script>
+<!-- Bootstrap-table.js -->
+<script src="../../static/js/lib/bootstrap-table.min.js" th:src="@{/js/lib/bootstrap-table.min.js}"></script>
+<script src="../../static/js/lib/bootstrap-table-zh-CN.min.js"
+        th:src="@{/js/lib/bootstrap-table-zh-CN.min.js}"></script>
+<!-- sweetalert2.js -->
+<script src="../../static/js/lib/sweetalert.min.js" th:src="@{/js/lib/sweetalert.min.js}"></script>
+<script src="../../static/js/lib/es6-promise.auto.min.js" th:src="@{/js/lib/es6-promise.auto.min.js}"></script>
+<!-- jquery-ui.js -->
+<script src="../../static/js/lib/jquery-ui.min.js" th:src="@{/js/lib/jquery-ui.min.js}"></script>
+<script src="../../static/js/common.js" th:src="@{/js/common.js}"></script>
+<script src="../../static/js/dragModel.js" th:src="@{/js/dragModel.js}"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.1.0/echarts.min.js"></script>
+<script>
+    /** 初始化 */
+    let $table = $('#table');
+    let $id = getQueryString("id");
+    changeToolTip();
+    var hearDiv = document.getElementById("headDiv");
+
+    // 服务器分页获取数据
+    function getServerPaging(node, url, queryParams) {
+        initBondTable(node, url, [10, 25, 50, 100, "All"], queryParams, [{
+            field: 'id',
+            title: '序号',
+            width: "35px",
+            formatter: stringFormatter
+        }, {
+            field: 'name',
+            title: '股票',
+            width: '50px',
+            formatter: stringFormatter
+        }, {
+            field: 'typeName',
+            title: '类型',
+            width: '30px',
+            formatter: stringFormatter
+        }, {
+            field: 'girdSpacing',
+            title: '格差',
+            width: '30px',
+            formatter: stringFormatter
+        }, {
+            field: 'price',
+            title: '购买价格',
+            width: '30px',
+            formatter: stringFormatter
+        }, {
+            field: 'count',
+            title: '购买数量',
+            width: '30px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'backMoney',
+            title: '归还金额',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'sellCount',
+            title: '出售数量',
+            width: '30px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'sellAvgPrice',
+            title: '出售均价',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'sellIncome',
+            title: '出售盈亏',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'curIncome',
+            title: '持股盈亏',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        },{
+            field: 'buyDate',
+            title: '购买日期',
+            width: "50px",
+            formatter: stringFormatter
+        },{
+            field: 'sellDate',
+            title: '出售日期',
+            width: "50px",
+            formatter: stringFormatter
+        }, {
+            field: 'cost',
+            title: '税费佣金',
+            width: "30px",
+            formatter: stringFormatter
+        }, {
+            field: 'interest',
+            title: '利息',
+            width: "30px",
+            formatter: stringFormatter
+        }, {
+            field: 'remarks',
+            title: '备注',
+            width: "70px",
+            formatter: stringFormatter
+        },{
+            field: 'operation',
+            title: '出售',
+            width: '170px',
+            formatter: operateFormatter // 自定义方法，添加操作按钮
+        }]);
+    }
+
+    // 初始化表格
+    function initBondTable(node, url, pageList, queryParams, columns, toolbar = '#toolbar') {
+        node.bootstrapTable("destroy");         // 先销毁用来的表格再构造新的表格
+        node.bootstrapTable({
+            toolbar: toolbar,                   // 工具按钮用哪个容器
+            method: 'get',                      // 请求方式
+            url: url,                           // 请求路径
+            dataType: "json",                   // 服务器返回的数据类型
+            contentType: "application/json",    // 发送到服务器的数据编码类型
+            striped: true,                     // 是否显示行间隔色
+            cache: false,                      // 是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+            pagination: true,                  // 是否显示分页（*）
+            sortable: false,                   // 是否启用排序
+            sortOrder: "asc",                   // 排序方式
+            sidePagination: "server",           // 分页方式：client客户端分页，server服务端分页（*）
+            queryParamsType: "limit",           // 设置为 ‘limit’ 则会发送符合 RESTFul 格式的参数
+            pageNumber: 1,                      // 初始化加载第一页，默认第一页
+            pageSize: 15,                       // 每页的记录行数（*）
+            pageList: pageList,                 // 可供选择的每页的行数（*）
+            showColumns: true,                 // 是否显示所有的列
+            showRefresh: true,                 // 是否显示刷新按钮
+            minimumCountColumns: 2,             // 最少允许的列数
+            clickToSelect: false,               // 是否启用点击选中行
+            showToggle:true,                   // 是否显示详细视图和列表视图的切换按钮
+            cardView: false,                   // 是否显示详细视图
+            detailView: true,                 // 是否显示父子表
+            detailFormatter :function(index, row, element){
+                       var str = "";
+                       let data = {
+                          buyId:row.id
+                       };
+                       let list;
+                      $.ajax({
+                            type: "POST",
+                            url: "/bond/sell/log",
+                            dataType: "json",
+                            async : false, //同步执行
+                            data: JSON.stringify(data),
+                            traditional: true,
+                            contentType : "application/json",
+                            success: function (result) {
+                                 list = result.module;
+                            },
+                            error: function () {
+                                swal("错误", "404", "error");
+                            }
+                          }
+                        );
+
+                            if(list.length > 0){
+                                str += "<div class='container'>";
+                                str += "<table id='tableSell' style='width: 1500px;' class='table table-striped table-hover table-bordered'>";
+                                str += "<br>";
+                                str +="<tr>";
+                                str +="<td>序号</td>";
+                                str +="<td>出售价格</td>";
+                                str +="<td>盈亏比</td>";
+                                str +="<td>出售数量</td>";
+                                str +="<td>成交总价</td>";
+                                str +="<td>佣金</td>";
+                                str +="<td>收益</td>";
+                                str +="<td>出售时间</td>";
+                                str +="</tr>";
+                            for(let i in list){
+                                console.log("得到的结果是：" + JSON.stringify(list[i]))
+                                str += "<tr>";
+                                str += "<td>";
+                                str += list[i].id;
+                                str += "</td>";
+                                str += "<td>";
+                                str += list[i].price;
+                                str += "</td>";
+                                str += "<td>";
+                                str += list[i].profitAndLoss;
+                                str += "</td>";
+                                str += "<td>";
+                                str += list[i].count;
+                                str += "</td>";
+                                str += "<td>";
+                                str += list[i].totalPrice;
+                                str += "</td>";
+                                str += "<td>";
+                                str += list[i].cost;
+                                str += "</td>";
+                                str += "<td>";
+                                str += list[i].income;
+                                str += "</td>";
+                                str += "<td>";
+                                str += dateFormatter(list[i].createTime);
+                                str += "</td>";
+                                str += "</tr>";
+                            }
+                            str += "</table>";
+                            str += "</div>";
+                        }
+
+                    return str;
+            },
+            uniqueId: "id",                     // 每一行的唯一标识，一般为主键列
+            dataField: "rows",                  // 这是返回的json数组的key.默认好像是"rows".这里只要前后端约定好就行
+            queryParams: queryParams,
+            responseHandler: result => {
+                if (result.success === false) {
+                    switch (result.code) {
+                        case 9001: swal("错误", "数据库错误", "error");   break;
+                        case 9002: swal("错误", "参数错误", "error");     break;
+                        case 9999: swal("错误", "系统错误", "error");     break;
+                    }
+                    return null;
+                } else {
+                    return { total: result.module.total, rows: result.module.rows, };
+                }
+            },
+            columns: columns,
+            rowStyle: function (row, index) {
+                let classesArr = ['info', '#ffffff'];
+                let strClass = "";
+                if (index % 2 === 0) {  // 偶数行
+                    strClass = classesArr[0];
+                } else {    // 奇数行
+                    strClass = classesArr[1];
+                }
+                return { classes: strClass };
+            }
+        });
+    }
+
+
+    function operateFormatter(value, row, index) {  // 赋予的参数
+        if(row.financing == 1){
+            return [
+                '<button class="btn btn-primary view" data-toggle="modal" data-target="#alterModal" onclick="initUpdate('+ index +');">编辑</button>&nbsp;&nbsp;'+
+                '<button class="btn btn-primary view" data-toggle="modal" data-target="#sellModal" onclick="sell('+ index +');">出售</button>&nbsp;&nbsp;'+
+                '<button class="btn btn-primary view" data-toggle="modal" data-target="#backModal"  onclick="back('+ index +');">归还</button>&nbsp;&nbsp;'+
+                '<button class="btn btn-primary view" onclick="deleteOne('+ index +');">删除</button>&nbsp;&nbsp;'
+            ].join('');
+
+        }else{
+                return [
+                '<button class="btn btn-primary view" data-toggle="modal" data-target="#alterModal" onclick="initUpdate('+ index +');">编辑</button>&nbsp;&nbsp;'+
+                '<button class="btn btn-primary view" data-toggle="modal" data-target="#sellModal" onclick="sell('+ index +');">出售</button>&nbsp;&nbsp;'+
+                '<button class="btn btn-primary view" data-toggle="modal" data-target="#exchangeModal"  onclick="back('+ index +');">交换</button>&nbsp;&nbsp;'+
+                '<button class="btn btn-primary view" onclick="deleteOne('+ index +');">删除</button>&nbsp;&nbsp;'
+            ].join('');
+        }
+
+    }
+
+    function init() {
+        getServerPaging($table, "/bond/operating/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC" ,id:$id};
+        });
+        loadBondInfoData("/bond/info");
+        loadProfitData("/bond/analyse");
+    }
+
+function loadProfitData(url){
+       let data = {
+          type:'1',
+          gpId:$id
+       };
+      $.ajax({
+            type: "POST",
+            url: url,
+            dataType: "json",
+            async : false, //同步执行
+            data: JSON.stringify(data),
+            traditional: true,
+            contentType : "application/json",
+            success: function (result) {
+                loadPageData(result);
+            },
+            error: function () {
+                swal("错误", "404", "error");
+            }
+         }
+        );
+    }
+
+    function loadBondInfoData(url){
+       let data = {
+          id:$id
+       };
+      $.ajax({
+            type: "POST",
+            url: url,
+            dataType: "json",
+            async : false, //同步执行
+            data: JSON.stringify(data),
+            traditional: true,
+            contentType : "application/json",
+            success: function (result) {
+                loadTodayPageData(result);
+            },
+            error: function () {
+                swal("错误", "404", "error");
+            }
+         }
+        );
+    }
+
+    let curPrice;
+    function loadTodayPageData(result){
+         curPrice = result.module.price;
+         document.getElementById("title").innerHTML=result.module.name;
+         var textHTML = '<tr>';
+         textHTML+='<td>当前价格</td>';
+         textHTML+='<td>今日收益</td>';
+         textHTML+='<td>交易金额(今日)</td>';
+         textHTML+='<td>买入金额(今日)</td>';
+         textHTML+='<td>卖出金额(今日)</td>';
+         textHTML+='<td>佣金费用(今日)</td>';
+         textHTML+='<td>购买次数(今日)</td>';
+         textHTML+='<td>盈利笔数(今日)</td>';
+         textHTML+='<td>亏损笔数(今日)</td>';
+         textHTML+='<td>成功率(今日)</td>';
+         textHTML+='<td>最大亏损(今日)</td>';
+         textHTML+='<td>最大盈利(今日)</td>';
+
+          textHTML+='</tr>';
+          textHTML+='<td>'+curPrice+'</td>';
+          textHTML+='<td>'+result.module.todayProfit+'</td>';
+          textHTML+='<td>'+result.module.transactionAmount+'</td>';
+          textHTML+='<td>'+result.module.buyAmount+'</td>';
+          textHTML+='<td>'+result.module.sellAmount+'</td>';
+          textHTML+='<td>'+result.module.cost+'</td>';
+          textHTML+='<td>'+result.module.buyNumber+'</td>';
+          textHTML+='<td>'+result.module.profitNumber+'</td>';
+          textHTML+='<td>'+result.module.lossNumber+'</td>';
+          textHTML+='<td>'+result.module.winning+'</td>';
+          textHTML+='<td>'+result.module.maxLoss+'</td>';
+          textHTML+='<td>'+result.module.maxProfit+'</td>';
+          textHTML+='</tr>';
+          document.getElementById("bondInfo").innerHTML = textHTML;
+    }
+
+    function getQueryString(name) {
+        var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) {
+           return unescape(r[2]);
+        }
+        return null;
+    }
+
+    function filter() {
+        let data = {
+            type: '1'
+        };
+        getServerPaging($table, "/bond/operating/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", type: data.type,id:$id};
+        });
+    }
+
+
+    function filter_sell() {
+        let data = {
+            status:'1'
+        };
+        getServerPaging($table, "/bond/operating/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC",id:$id,status:data.status};
+        });
+    }
+
+    function filter_no_sell() {
+        let data = {
+            status:'0'
+        };
+        getServerPaging($table, "/bond/operating/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC",id:$id,status:data.status};
+        });
+    }
+
+     function filter_no_sell_gird() {
+        let data = {
+            status:'0',
+            type:'0'
+        };
+        getServerPaging($table, "/bond/operating/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC",id:$id,status:data.status,type:data.type};
+        });
+    }
+
+     function filter_no_sell_stu() {
+        let data = {
+            status:'0',
+            type:'1'
+        };
+        getServerPaging($table, "/bond/operating/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC",id:$id,status:data.status,type:data.type};
+        });
+    }
+
+    function filter_no_sell_flow() {
+        let data = {
+            status:'0',
+            type:'2'
+        };
+        getServerPaging($table, "/bond/operating/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC",id:$id,status:data.status,type:data.type};
+        });
+    }
+
+
+   function filter_wait_buy(){
+        let data = {
+            status:'3'
+        };
+        getServerPaging($table, "/bond/operating/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC",id:$id,status:data.status};
+        });
+   }
+
+
+    function filter_wg() {
+        let data = {
+            type: '0'
+        };
+        getServerPaging($table, "/bond/operating/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", type: data.type,id:$id};
+        });
+    }
+
+    dragTheModalDialog();
+
+   function addBond(){
+        loadBondInfoData("/bond/info");
+        $('#insert_input_price').val(curPrice);
+        $('#insert_input_count').val(100);
+        $("#insert_input_buy_date").val(new Date().toISOString().substring(0, 10));
+   }
+
+    function insert() {
+        let data = {
+            count: $('#insert_input_count').val(),
+            gpId: $id,
+            price: $('#insert_input_price').val(),
+            buyDate: $('#insert_input_buy_date').val(),
+            remarks: $('#insert_input_remarks').val(),
+            type: $('#insert_input_type').val(),
+            status: $('#insert_input_status').val(),
+            financing: $('#insert_input_financing').val(),
+        };
+         if (data.id <= 0) {
+            swal("操作提示", "请输入股票代码", "info");
+        } else if (data.price <= 0) {
+            swal("操作提示", "价格不合法", "info");
+        } else {
+            parameterPostRequest("/bond/operating/buy", data, () => {
+                $('#addModal').modal('hide');
+                swal("正确", "添加成功", "success");
+                init();
+            });
+        }
+    }
+
+   function addBondBuySell(){
+        loadBondInfoData("/bond/info");
+        $('#insert_input_buy_price').val(curPrice);
+        $('#insert_input_buy_count').val(100);
+        $("#insert_input_bond_buy_date").val(new Date().toISOString().substring(0, 10));
+        $("#insert_input_bond_sell_date").val(new Date().toISOString().substring(0, 10));
+        $('#insert_input_sell_price').val(curPrice);
+   }
+
+    function buyAndSell() {
+        let data = {
+            count: $('#insert_input_buy_count').val(),
+            gpId: $id,
+            price: $('#insert_input_buy_price').val(),
+            buyDate: $('#insert_input_bond_buy_date').val(),
+            sellDate: $('#insert_input_bond_sell_date').val(),
+            remarks: $('#insert_input_remarks').val(),
+            type: $('#insert_input_type').val(),
+            financing: 0,
+            status: 0,
+            sellPrice: $('#insert_input_sell_price').val(),
+        };
+         if (data.id <= 0) {
+            swal("操作提示", "请输入股票代码", "info");
+        } else if (data.price <= 0) {
+            swal("操作提示", "价格不合法", "info");
+        } else {
+            parameterPostRequest("/bond/operating/buy", data, () => {
+                $('#addModal').modal('hide');
+                swal("正确", "添加成功", "success");
+                init();
+            });
+        }
+    }
+
+
+    // alter记录id
+    let alterId;
+    function initUpdate(index) {
+        let rows = $table.bootstrapTable('getData');
+        $('#alert_input_id').val(rows[index].id);
+        $('#alert_input_type').val(rows[index].type);
+        $('#alert_input_financing').val(rows[index].financing);
+        $('#alert_input_price').val(rows[index].price);
+        $('#alert_input_count').val(rows[index].count);
+        $('#alert_input_buy_date').val(rows[index].buyDate);
+        $('#alert_input_status').val(rows[index].status);
+        $('#alert_input_remarks').val(rows[index].remarks);
+        alterId = rows[index].id;
+    }
+
+    function alter() {
+        let data = {
+            id: alterId,
+            gpId: $id,
+            count: $('#alert_input_count').val(),
+            type: $('#alert_input_type').val(),
+            financing: $('#alert_input_financing').val(),
+            sellCount: $('#alert_input_sell_count').val(),
+            sellIncome: $('#alert_input_sell_income').val(),
+            price: $('#alert_input_price').val(),
+            buyDate: $('#alert_input_buy_date').val(),
+            status: $('#alert_input_status').val(),
+            remarks: $('#alert_input_remarks').val(),
+        };
+        if ("" === data.id) {
+            swal("操作提示", "用户不存在", "info");
+        }  else {
+            parameterPostRequest("/bond/operating/update", data, () => {
+                $('#alterModal').modal('hide');
+                swal("正确", "编辑成功", "success");
+                init();
+            });
+        }
+    }
+
+
+  function back(index) {
+        loadBondInfoData("/bond/info");
+        let rows = $table.bootstrapTable('getData');
+        $('#back_buy_id').val(rows[index].id);
+        $('#back_gp_id').val(rows[index].gpId);
+        $('#back_input_money').val(Math.round(parseFloat((rows[index].count - rows[index].sellCount)*rows[index].price - rows[index].backMoney)*100)/100);
+        $('#back_input_interest').val(rows[index].interest==null?0:rows[index].interest);
+        var now = new Date();
+        var day = ("0" + now.getDate()).slice(-2);
+        var month = ("0" + (now.getMonth() + 1)).slice(-2);
+        var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
+        $('#back_input_date').val(today);
+  }
+
+  function backCommit() {
+          let data = {
+            id: $('#back_buy_id').val(),
+            totalPrice:$('#back_input_money').val(),
+            interest:$('#back_input_interest').val(),
+            backTime: $('#back_input_date').val()
+         };
+        parameterPostRequest("/bond/operating/back", data, () => {
+                $('#addModal').modal('hide');
+                swal("正确", "添加成功", "success");
+                init();
+         });
+  }
+
+  function sell(index) {
+        loadBondInfoData("/bond/info");
+        let rows = $table.bootstrapTable('getData');
+        $('#sell_buy_id').val(rows[index].id);
+        $('#sell_gp_id').val(rows[index].gpId);
+        $('#sell_input_count').val(rows[index].count - rows[index].sellCount);
+        $('#sell_input_price').val(curPrice);
+        $('#sell_input_freeze').val(0);
+        $('#sell_input_interest').val(rows[index].interest);
+        var now = new Date();
+        var day = ("0" + now.getDate()).slice(-2);
+        var month = ("0" + (now.getMonth() + 1)).slice(-2);
+        var today = now.getFullYear()+"-"+(month)+"-"+(day) ;
+        $('#sell_input_date').val(today);
+
+    }
+
+    function sellSave() {
+         let data = {
+            buyId: $('#sell_buy_id').val(),
+            price: $('#sell_input_price').val(),
+            freeze:$('#sell_input_freeze').val(),
+            interest:$('#sell_input_interest').val(),
+            count: $('#sell_input_count').val(),
+            createTime: $('#sell_input_date').val()
+         };
+         if (data.price <= 0) {
+            swal("操作提示", "价格不合法", "info");
+        } else {
+            parameterPostRequest("/bond/operating/sell", data, () => {
+                $('#addModal').modal('hide');
+                swal("正确", "添加成功", "success");
+                init();
+            });
+        }
+    }
+
+
+
+    function deleteOne(index) {
+        dialog("确定删除吗？", () => {
+            let data = { id: $table.bootstrapTable('getData')[index].id };
+            parameterPostRequest("/bond/operating/delete", data, () => {
+                swal("正确", "删除成功", "success");
+                init();
+            });
+        });
+    }
+
+
+
+
+
+
+</script>
+</body>
+</html>

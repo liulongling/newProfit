@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.profit.bond.mapper.BondSellLogMapper">
+
+  <resultMap type="BondSellLog" id="BondSellLogResult">
+    <result property="id"    column="id"    />
+    <result property="gpId"    column="gp_id"    />
+    <result property="buyId"    column="buy_id"    />
+    <result property="price"    column="price"    />
+    <result property="count"    column="count"    />
+    <result property="totalPrice"    column="total_price"    />
+    <result property="cost"    column="cost"    />
+    <result property="totalCost"    column="total_cost"    />
+    <result property="income"    column="income"    />
+    <result property="surplusCount"    column="surplus_count"    />
+    <result property="realyBefore"    column="realy_before"    />
+    <result property="realyAfter"    column="realy_after"    />
+    <result property="createTime"    column="create_time"    />
+  </resultMap>
+
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+
+  <select id="countByExample" parameterType="com.profit.bond.domain.BondSellLogExample" resultType="java.lang.Long">
+    select count(*) from bond_sell_log
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+
+  <sql id="selectBondSellLogVo">
+    select id, gp_id, buy_id, price, count, total_price, cost, total_cost, income, surplus_count, realy_before, realy_after, create_time from bond_sell_log
+  </sql>
+
+  <select id="selectBondSellLogList" parameterType="BondSellLog" resultMap="BondSellLogResult">
+    <include refid="selectBondSellLogVo"/>
+    <where>
+      <if test="gpId != null  and gpId != ''"> and gp_id = #{gpId}</if>
+      <if test="buyId != null "> and buy_id = #{buyId}</if>
+      <if test="price != null "> and price = #{price}</if>
+      <if test="count != null "> and count = #{count}</if>
+      <if test="totalPrice != null "> and total_price = #{totalPrice}</if>
+      <if test="cost != null "> and cost = #{cost}</if>
+      <if test="totalCost != null "> and total_cost = #{totalCost}</if>
+      <if test="income != null "> and income = #{income}</if>
+      <if test="surplusCount != null "> and surplus_count = #{surplusCount}</if>
+      <if test="realyBefore != null "> and realy_before = #{realyBefore}</if>
+      <if test="realyAfter != null "> and realy_after = #{realyAfter}</if>
+    </where>
+  </select>
+
+  <select id="selectBondSellLogById" parameterType="Long" resultMap="BondSellLogResult">
+    <include refid="selectBondSellLogVo"/>
+    where id = #{id}
+  </select>
+
+  <insert id="insertBondSellLog" parameterType="BondSellLog" useGeneratedKeys="true" keyProperty="id">
+    insert into bond_sell_log
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="gpId != null">gp_id,</if>
+      <if test="buyId != null">buy_id,</if>
+      <if test="price != null">price,</if>
+      <if test="count != null">count,</if>
+      <if test="totalPrice != null">total_price,</if>
+      <if test="cost != null">cost,</if>
+      <if test="totalCost != null">total_cost,</if>
+      <if test="income != null">income,</if>
+      <if test="surplusCount != null">surplus_count,</if>
+      <if test="realyBefore != null">realy_before,</if>
+      <if test="realyAfter != null">realy_after,</if>
+      <if test="createTime != null">create_time,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="gpId != null">#{gpId},</if>
+      <if test="buyId != null">#{buyId},</if>
+      <if test="price != null">#{price},</if>
+      <if test="count != null">#{count},</if>
+      <if test="totalPrice != null">#{totalPrice},</if>
+      <if test="cost != null">#{cost},</if>
+      <if test="totalCost != null">#{totalCost},</if>
+      <if test="income != null">#{income},</if>
+      <if test="surplusCount != null">#{surplusCount},</if>
+      <if test="realyBefore != null">#{realyBefore},</if>
+      <if test="realyAfter != null">#{realyAfter},</if>
+      <if test="createTime != null">#{createTime},</if>
+    </trim>
+  </insert>
+
+  <update id="updateBondSellLog" parameterType="BondSellLog">
+    update bond_sell_log
+    <trim prefix="SET" suffixOverrides=",">
+      <if test="gpId != null">gp_id = #{gpId},</if>
+      <if test="buyId != null">buy_id = #{buyId},</if>
+      <if test="price != null">price = #{price},</if>
+      <if test="count != null">count = #{count},</if>
+      <if test="totalPrice != null">total_price = #{totalPrice},</if>
+      <if test="cost != null">cost = #{cost},</if>
+      <if test="totalCost != null">total_cost = #{totalCost},</if>
+      <if test="income != null">income = #{income},</if>
+      <if test="surplusCount != null">surplus_count = #{surplusCount},</if>
+      <if test="realyBefore != null">realy_before = #{realyBefore},</if>
+      <if test="realyAfter != null">realy_after = #{realyAfter},</if>
+      <if test="createTime != null">create_time = #{createTime},</if>
+    </trim>
+    where id = #{id}
+  </update>
+
+  <delete id="deleteBondSellLogById" parameterType="Long">
+    delete from bond_sell_log where id = #{id}
+  </delete>
+
+  <delete id="deleteBondSellLogByIds" parameterType="String">
+    delete from bond_sell_log where id in
+    <foreach item="id" collection="array" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+
+  <select id="listGroupByGpId" resultType="map">
+    SELECT gp_id as gpId,sum(income) as income FROM bond_sell_log
+    <where>
+      <if test="request.startTime != null and request.endTime != null">
+        create_time BETWEEN #{request.startTime} AND #{request.endTime}
+      </if>
+    </where>
+    GROUP BY gp_id
+  </select>
+
+  <select id="sumIncomeByGpId" resultType="DOUBLE">
+    SELECT
+    IFNULL(sum(income),0)
+    FROM bond_sell_log
+    <where>
+      <if test="request.gpId != null">
+        gp_id = #{request.gpId}
+      </if>
+      <if test="request.startTime != null and request.endTime != null">
+        AND create_time BETWEEN #{request.startTime} AND #{request.endTime}
+      </if>
+    </where>
+  </select>
+
+  <select id="sumIncomeByType"  resultType="java.lang.Double">
+    SELECT
+    IFNULL(sum(a.income),0)
+    FROM
+    bond_sell_log as a,bond_buy_log as b
+    <where>
+      a.buy_id = b.id
+      AND
+      <if test="request.startTime != null and request.endTime != null">
+        a.create_time BETWEEN #{request.startTime} AND #{request.endTime}
+      </if>
+      AND
+      <if test="request.type != null ">
+        b.type = #{request.type}
+      </if>
+    </where>
+  </select>
+
+  <select id="sumLossIncome" resultType="java.lang.Double">
+    SELECT
+    IFNULL(sum(income),0)
+    FROM
+    bond_sell_log
+    <where>
+      <![CDATA[income < 0]]>
+      <if test="request.startTime != null and request.endTime != null">
+        AND  create_time BETWEEN #{request.startTime} AND #{request.endTime}
+      </if>
+    </where>
+  </select>
+
+  <select id="sumIncome" resultType="java.lang.Double">
+    SELECT
+    IFNULL(sum(income),0)
+    FROM
+    bond_sell_log
+    <where>
+      <if test="request.startTime != null and request.endTime != null">
+        create_time BETWEEN #{request.startTime} AND #{request.endTime}
+      </if>
+      <if test="request.gpId != null">
+        AND gp_id = #{request.gpId}
+      </if>
+    </where>
+  </select>
+
+  <select id="selectByExample" parameterType="com.profit.bond.domain.BondSellLogExample" resultMap="BondSellLogResult">
+    <include refid="selectBondSellLogVo" />
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+
+
+  <select id="sumCost" resultType="java.lang.Double">
+    SELECT
+    IFNULL(sum(total_cost),0)
+    FROM
+    bond_sell_log
+    WHERE
+    create_time BETWEEN #{request.startTime} AND #{request.endTime}
+  </select>
+
+  <select id="listIncomeGroupByDate" resultType="map">
+    select DATE_FORMAT(create_time, '%m%d') as incomeDate, sum(income) as income from bond_sell_log
+    <where>
+      <if test="request.gpId != null">
+        gp_id = #{request.gpId}
+      </if>
+      <if test="request.startTime != null and request.endTime != null">
+        AND create_time BETWEEN #{request.startTime} AND #{request.endTime}
+      </if>
+    </where>
+    GROUP BY  DATE_FORMAT(create_time, '%Y%m%d') asc
+  </select>
+
+</mapper>

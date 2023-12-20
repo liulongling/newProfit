@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<th:block th:include="include :: header('图表组合')"/>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+	<form class="form-horizontal" th:object="${main}">
+		<div class="row">
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5 class="m-b-md">今天数据</h5>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content ">
+						<h5 class="m-b-md">本月数据</h5>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="ibox">
+
+					<div class="ibox-content">
+						<h5 class="m-b-md">今年数据</h5>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5 class="m-b-md">总数据</h5>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<div class="row">
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>菜钱</h5>
+						<h1 class="no-margins" th:text="*{today.profit}"></h1>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>菜钱</h5>
+						<h1 class="no-margins" th:text="*{month.profit}"></h1>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>菜钱</h5>
+						<h1 class="no-margins" th:text="*{year.profit}"></h1>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>菜钱</h5>
+						<h1 class="no-margins" th:text="*{total.profit}"></h1>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>止盈/止损(笔数)</h5>
+						<span style="font-size:26px" th:text="*{today.profitNumber}"></span>
+						<span style="font-size:26px" >/</span>
+						<span style="font-size:26px"th:text="*{today.lossNumber}"></span>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>止盈/止损(笔数)</h5>
+						<span style="font-size:26px" th:text="*{month.profitNumber}"></span>
+						<span style="font-size:26px" >/</span>
+						<span style="font-size:26px"th:text="*{month.lossNumber}"></span>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>止盈/止损(笔数)</h5>
+						<span style="font-size:26px" th:text="*{year.profitNumber}"></span>
+						<span style="font-size:26px" >/</span>
+						<span style="font-size:26px"th:text="*{year.lossNumber}"></span>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>止盈/止损(笔数)</h5>
+						<span style="font-size:26px" th:text="*{total.profitNumber}"></span>
+						<span style="font-size:26px" >/</span>
+						<span style="font-size:26px"th:text="*{total.lossNumber}"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>成功率</h5>
+						<h2 th:text="*{today.winning}">%</h2>
+						<div class="progress progress-mini">
+							<div th:style="'width:' + *{today.winning}" class="progress-bar"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>成功率</h5>
+						<h2 th:text="*{month.winning}">%</h2>
+						<div class="progress progress-mini">
+							<div th:style="'width:' + *{month.winning}" class="progress-bar"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>成功率</h5>
+						<h2 th:text="*{year.winning}">%</h2>
+						<div class="progress progress-mini">
+							<div th:style="'width:' + *{year.winning}" class="progress-bar"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>成功率</h5>
+						<h2 th:text="*{total.winning}">%</h2>
+						<div class="progress progress-mini">
+							<div th:style="'width:' + *{total.winning}" class="progress-bar"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>买入/卖出金额</h5>
+						<span style="font-size:26px" th:text="*{today.buyAmount}"></span>
+						<span style="font-size:26px" >/</span>
+						<span style="font-size:26px"th:text="*{today.sellAmount}"></span>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>买入/卖出金额</h5>
+						<span style="font-size:26px" th:text="*{month.buyAmount}"></span>
+						<span style="font-size:26px" >/</span>
+						<span style="font-size:26px"th:text="*{month.sellAmount}"></span>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>买入/卖出金额</h5>
+						<span style="font-size:26px" th:text="*{year.buyAmount}"></span>
+						<span style="font-size:26px" >/</span>
+						<span style="font-size:26px"th:text="*{year.sellAmount}"></span>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>买入/卖出金额</h5>
+						<span style="font-size:26px" th:text="*{total.buyAmount}"></span>
+						<span style="font-size:26px" >/</span>
+						<span style="font-size:26px"th:text="*{total.sellAmount}"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="row">
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>佣金税费</h5>
+						<h1 class="no-margins" th:text="*{today.cost}"></h1>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>佣金税费</h5>
+						<h1 class="no-margins" th:text="*{month.cost}"></h1>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>佣金税费</h5>
+						<h1 class="no-margins" th:text="*{year.cost}"></h1>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>佣金税费</h5>
+						<h1 class="no-margins" th:text="*{total.cost}"></h1>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-3">
+				<div class="ibox">
+					<div class="ibox-content">
+						<h5>菜钱收益TOP</h5>
+						<table class="table table-stripped small m-t-md">
+							<tbody>
+							<tr th:each="item:${todayList}">
+								<td class="no-borders">
+									<i th:class="${item.money} > 0 ? 'fa fa-circle text-danger':'fa fa-circle text-navy'"></i>
+								</td>
+								<td class="no-borders">
+									[[${item.name}]] [[${item.money}]]
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-3">
+					<div class="ibox">
+						<div class="ibox-content">
+							<h5>菜钱收益TOP</h5>
+							<table class="table table-stripped small m-t-md">
+								<tbody>
+									<tr th:each="item:${monthList}">
+										<td class="no-borders">
+											<i th:class="${item.money} > 0 ? 'fa fa-circle text-danger':'fa fa-circle text-navy'"></i>
+										</td>
+										<td class="no-borders">
+											[[${item.name}]] [[${item.money}]]
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-3">
+						<div class="ibox">
+							<div class="ibox-content">
+								<h5>今年收益TOP</h5>
+								<table class="table table-stripped small m-t-md">
+									<tbody>
+										<tr th:each="item:${yearList}">
+											<td class="no-borders">
+												<i th:class="${item.money} > 0 ? 'fa fa-circle text-danger':'fa fa-circle text-navy'"></i>
+											</td>
+											<td class="no-borders">
+												[[${item.name}]] [[${item.money}]]
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-3">
+							<div class="ibox">
+								<div class="ibox-content">
+									<h5>总收益TOP</h5>
+									<table class="table table-stripped small m-t-md">
+										<tbody>
+											<tr th:each="item:${totalList}">
+												<td class="no-borders">
+													<i th:class="${item.money} > 0 ? 'fa fa-circle text-danger':'fa fa-circle text-navy'"></i>
+												</td>
+												<td class="no-borders">
+													[[${item.name}]] [[${item.money}]]
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
+</body>
+</html>

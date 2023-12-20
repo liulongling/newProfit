@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>股票记录</title>
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="../../static/css/lib/bootstrap3.4.1.min.css"
+          th:href="@{/css/lib/bootstrap3.4.1.min.css}">
+    <!-- Bootstrap-table CSS-->
+    <link rel="stylesheet" href="../../static/css/lib/bootstrap-table.min.css"
+          th:href="@{/css/lib/bootstrap-table.min.css}">
+    <!-- jquery-ui CSS-->
+    <link rel="stylesheet" href="../../static/css/lib/jquery-ui.min.css" th:href="@{/css/lib/jquery-ui.min.css}">
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" href="../../static/css/table.css" th:href="@{/css/table.css}">
+    <!-- 每30秒钟刷新一次页面 -->
+    <!--    <meta http-equiv="refresh" content="60">-->
+</head>
+
+<body onload="init();">
+
+<div class="container" style="width: 2200px;">
+    <div id="pie" style="width:700px; height: 400px;float:left"></div>
+    <div id="pie1" style="width:700px; height: 400px;float:left"></div>
+    <div id="pie4" style="width:700px; height: 400px;float:left"></div>
+</div>
+
+<div class="panel-body" style="padding-bottom:0;">
+    <div class="panel panel-default">
+        <ul id="myTab" class="nav nav-tabs">
+            <li><a href="#全部" data-toggle="tab" onclick="init();">全部</a></li>
+            <li><a href="#股票" data-toggle="tab" onclick="filter();">股票</a></li>
+            <li><a href="#ETF" data-toggle="tab" onclick="filterEtf();">ETF</a></li>
+        </ul>
+    </div>
+    <table id="table"></table>
+</div>
+
+<!-- JavaScript files-->
+<!-- jquery.js -->
+<script src="../../static/js/lib/jquery.min.js" th:src="@{/js/lib/jquery.min.js}"></script>
+<!-- Bootstrap.js -->
+<script src="../../static/js/lib/bootstrap3.4.1.min.js" th:src="@{/js/lib/bootstrap3.4.1.min.js}"></script>
+<!-- Bootstrap-table.js -->
+<script src="../../static/js/lib/bootstrap-table.min.js" th:src="@{/js/lib/bootstrap-table.min.js}"></script>
+<script src="../../static/js/lib/bootstrap-table-zh-CN.min.js"
+        th:src="@{/js/lib/bootstrap-table-zh-CN.min.js}"></script>
+<!-- sweetalert2.js -->
+<script src="../../static/js/lib/sweetalert.min.js" th:src="@{/js/lib/sweetalert.min.js}"></script>
+<script src="../../static/js/lib/es6-promise.auto.min.js" th:src="@{/js/lib/es6-promise.auto.min.js}"></script>
+<!-- jquery-ui.js -->
+<script src="../../static/js/lib/jquery-ui.min.js" th:src="@{/js/lib/jquery-ui.min.js}"></script>
+<script src="../../static/js/common.js" th:src="@{/js/common.js}"></script>
+<script src="../../static/js/dragModel.js" th:src="@{/js/dragModel.js}"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.1.0/echarts.min.js"></script>
+<script>
+    /** 初始化 */
+    let $table = $('#table');
+
+    changeToolTip();
+
+    // 服务器分页获取数据
+    function getServerPaging(node, url, queryParams) {
+        initTable(node, url, [10, 25, 50, 100, "All"], queryParams, [{
+            checkbox: true
+        }, {
+            field: 'id',
+            title: '股票代码',
+            width: "70px",
+            formatter: stringFormatter
+        }, {
+            field: 'name',
+            title: '股票名称',
+            width: "100px",
+            formatter: stringFormatter
+        }, {
+            field: 'price',
+            title: '当前股价',
+            width: '50px',
+            formatter: stringFormatter
+        }, {
+            field: 'stubProfit',
+            title: '短线收益',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'gridProfit',
+            title: '长线收益',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'stubCount',
+            title: '短线股数',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'gridCount',
+            title: '长线股数',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'superStubCount',
+            title: '超短股数',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'gpCount',
+            title: '持股总数量',
+            width: '70px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'realPosition',
+            title: '仓位占比',
+            width: '50px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'profit',
+            title: '到手收益',
+            width: "70px",
+            formatter: stringFormatter
+        }, {
+            field: 'gpProfit',
+            title: '持股盈亏',
+            width: '50px',
+            align: "center",
+            formatter: stringFormatter
+        }, {
+            field: 'curProfit',
+            title: '当前盈亏',
+            width: "70px",
+            formatter: stringFormatter
+        }, {
+            field: 'totalProfit',
+            title: '总收益',
+            width: "70px",
+            formatter: stringFormatter
+        }, {
+            field: 'costPrice',
+            title: '成本价',
+            width: "100px",
+            formatter: stringFormatter
+        }, {
+            field: 'market',
+            title: '持仓市值',
+            width: "50px",
+            formatter: stringFormatter
+        },{
+            field: 'lastMonthProfit',
+            title: '上月总收益',
+            width: "70px",
+            formatter: stringFormatter
+        },  {
+            field: 'curMonthProfit',
+            title: '本月总收益',
+            width: "70px",
+            formatter: stringFormatter
+        },{
+            field: 'curYearProfit',
+            title: '今年总收益',
+            width: "70px",
+            formatter: stringFormatter
+        }, {
+            field: 'winning',
+            title: '成功率',
+            width: "50px",
+            formatter: stringFormatter
+        }, {
+            field: 'operation',
+            title: '操作',
+            width: '170px',
+            formatter: operateFormatter // 自定义方法，添加操作按钮
+        }]);
+    }
+
+    function operateFormatter(value, row, index) {  // 赋予的参数
+        return [
+            '<button class="btn btn-primary view" data-toggle="modal" onclick="bondInfo('+ index +');">购买</button>&nbsp;&nbsp;'+
+            '<button class="btn btn-danger view"  onclick="profitAnlysis('+ index +');">收益分析</button>'
+        ].join('');
+    }
+
+    function init() {
+        getServerPaging($table, "/bond/profit/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC" };
+        });
+    }
+
+    function bondInfo(index){
+      let url = "http://127.0.0.1:"+window.location.port+"/bond/oper/transactionLogs?id="+$table.bootstrapTable('getData')[index].id;
+      window.open(url);
+    }
+
+    function filter() {
+        let data = {
+           isEtf: '0'
+        };
+        getServerPaging($table, "/bond/profit/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", isEtf: data.isEtf};
+        });
+    }
+
+    function filterEtf() {
+        let data = {
+            isEtf: '1'
+        };
+        getServerPaging($table, "/bond/profit/list", params => {
+            return { limit: params.limit, offset: params.offset, sort: "create_time", order: "DESC", isEtf: data.isEtf};
+        });
+    }
+
+         echartsParameterPostRequest("/bond/profit/analyse", {type:3}, function loadPageData(option){
+          // 获取页面容器
+         var chartDom = document.getElementById('pie');
+         // 容器初始化初始化（echarts）
+         var myChart = echarts.init(chartDom);
+         // 设置容器的相关配置项
+         myChart.setOption(option);
+     });
+
+     echartsParameterPostRequest("/bond/profit/analyse", {type:2}, function loadPageData(option){
+          // 获取页面容器
+         var chartDom = document.getElementById('pie1');
+         // 容器初始化初始化（echarts）
+         var myChart = echarts.init(chartDom);
+         // 设置容器的相关配置项
+         myChart.setOption(option);
+     });
+
+    echartsParameterPostRequest("/bond/profit/analyse", {type:4}, function loadPageData(option){
+          // 获取页面容器
+         var chartDom = document.getElementById('pie4');
+         // 容器初始化初始化（echarts）
+         var myChart = echarts.init(chartDom);
+         // 设置容器的相关配置项
+         myChart.setOption(option);
+     });
+
+</script>
+</body>
+</html>
