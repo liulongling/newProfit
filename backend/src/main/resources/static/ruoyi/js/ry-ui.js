@@ -140,7 +140,6 @@ var table = {
                     fixedRightNumber: options.fixedRightNumber,         // 列冻结的个数（右侧）
                     onReorderRow: options.onReorderRow,                 // 当拖拽结束后处理函数
                     queryParams: options.queryParams,                   // 传递参数（*）
-                    rowStyle: options.rowStyle,                         // 通过自定义函数设置行样式
                     footerStyle: options.footerStyle,                   // 通过自定义函数设置页脚样式
                     headerStyle: options.headerStyle,                   // 通过自定义函数设置标题样式
                     columns: options.columns,                           // 显示列信息（*）
@@ -152,6 +151,16 @@ var table = {
                     exportTypes: options.exportTypes,                   // 导出文件类型 （json、xml、png、csv、txt、sql、doc、excel、xlsx、powerpoint、pdf）
                     printPageBuilder: options.printPageBuilder,         // 自定义打印页面模板
                     detailFormatter: options.detailFormatter,           // 在行下面展示其他数据列表
+                    rowStyle: function (row, index) {
+                                let classesArr = ['info', '#ffffff'];
+                                let strClass = "";
+                                if (index % 2 === 0) {  // 偶数行
+                                    strClass = classesArr[0];
+                                } else {    // 奇数行
+                                    strClass = classesArr[1];
+                                }
+                                return { classes: strClass };
+                            }// 隔行变色
                 });
             },
             // 获取实例ID，如存在多个返回#id1,#id2 delimeter分隔符
