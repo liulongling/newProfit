@@ -1,8 +1,5 @@
 package com.profit.web.controller.bond;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.profit.bond.comparator.ComparatorBondSell;
 import com.profit.bond.domain.*;
 import com.profit.bond.dto.BondBuyLogDTO;
 import com.profit.bond.dto.BondBuyRequest;
@@ -21,6 +18,7 @@ import com.profit.common.utils.bean.BeanUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -32,9 +30,9 @@ import java.util.*;
  * @date 2023-12-10
  */
 @Controller
-@RequestMapping("/bond/operating")
+@RequestMapping("/bond/oper")
 public class BondOperController extends BaseController {
-    private String prefix = "/bond/operating";
+    private String prefix = "/bond/oper";
 
     @Autowired
     private IBondInfoService bondInfoService;
@@ -51,78 +49,25 @@ public class BondOperController extends BaseController {
         return prefix + "/transactionLogs";
     }
 
-    @GetMapping("list")
+    @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo getBonds(@RequestParam Map<String, Object> params) {
-        String id = params.get("id").toString();
-        BondInfo bondInfo = bondInfoService.selectBondInfoById(id);
-        BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
-        BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
-        criteria.andGpIdEqualTo(id);
-        bondBuyLogExample.setOrderByClause("oper_time desc");
-        if (params.get("type") != null) {
-            criteria.andTypeEqualTo(Byte.valueOf(params.get("type").toString()));
-            if (params.get("type").equals("0")) {
-                bondBuyLogExample.setOrderByClause("price desc");
-            }
-        }
-
-        byte status = 0;
-        if (params.get("status") != null) {
-            status = Byte.valueOf(params.get("status").toString());
-            criteria.andStatusEqualTo(status);
-            if (status == 1) {
-//                bondBuyLogExample.setOrderByClause("buy_date desc");
-            } else {
-                bondBuyLogExample.setOrderByClause("price desc");
-            }
-        }
-
-        Page<Object> page = PageHelper.offsetPage(Integer.valueOf(params.get("offset").toString()), Integer.valueOf(params.get("limit").toString()));
-        List<BondBuyLog> result = bondBuyLogService.selectByExample(bondBuyLogExample);
-        List<BondBuyLogDTO> list = new ArrayList<>(result.size());
-        for (int i = 0; i < result.size(); i++) {
-            BondBuyLog bondBuyLog = result.get(i);
-            //查看是否股票是否全部售出
-            if (bondBuyLog.getCount().intValue() == bondBuyLog.getSellCount().intValue()) {
-                if (bondBuyLog.getStatus() == 0) {
-                    bondBuyLog.setStatus((byte) 1);
-                    bondBuyLogService.updateBondBuyLog(bondBuyLog);
-                }
-            }
-            BondBuyLogDTO buyLogDTO = BeanUtils.copyBean(new BondBuyLogDTO(), bondBuyLog);
-            buyLogDTO.setName(bondInfo.getName());
-            //卖出均价
-            bondService.loadSellAvgPrice(bondBuyLog, buyLogDTO);
-            //当前持股盈亏
-            bondService.loadCurBondIncome(bondInfo, bondBuyLog, buyLogDTO);
-            //与上一个买点的格差
-            String girdSpacing = "0";
-            if (i > 0) {
-                girdSpacing = String.format("%.2f", ((bondBuyLog.getPrice() - result.get(i - 1).getPrice()) / bondBuyLog.getPrice()) * 100) + "%";
-            }
-            buyLogDTO.setGirdSpacing(girdSpacing);
-            if (bondBuyLog.getFinancing() == 1) {
-                buyLogDTO.setName(buyLogDTO.getName() + "(融)");
-                Double lendMoney = ((bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice() - bondBuyLog.getBackMoney()) + bondBuyLog.getBuyCost();
-                Date lendDate;
-                if (bondBuyLog.getBackTime() != null) {
-                    lendDate = bondBuyLog.getBackTime();
-                } else {
-                    lendDate = DateUtils.string2Date(bondBuyLog.getBuyDate(), DateUtils.YYYY_MM_DD);
-                }
-                buyLogDTO.setInterest(BondUtils.countInterest(lendMoney, lendDate));
-            } else {
-                buyLogDTO.setInterest(0.0);
-            }
-
-            list.add(buyLogDTO);
-            if (status == 1) {
-                Collections.sort(list, new ComparatorBondSell());
-            }
-        }
-
+    public TableDataInfo list(BondBuyLog bondBuyLog)
+    {
+        startPage();
+        List<BondBuyLogDTO> list = bondService.getBondBuyLogs(bondBuyLog);
         return getDataTable(list);
+    }
+
+    /**
+     * 修改股票购买日志
+     */
+    @RequiresPermissions("bond:oper:edit")
+    @GetMapping("/edit/{id}")
+    public String edit(@PathVariable("id") Long id, ModelMap mmap)
+    {
+        BondBuyLog bondBuyLog = bondBuyLogService.selectBondBuyLogById(id);
+        mmap.put("bondBuyLog", bondBuyLog);
+        return prefix + "/edit";
     }
 
     @PostMapping("buy")

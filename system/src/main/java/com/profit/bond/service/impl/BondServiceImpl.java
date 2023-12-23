@@ -1,5 +1,6 @@
 package com.profit.bond.service.impl;
 
+import com.profit.bond.comparator.ComparatorBondSell;
 import com.profit.bond.comparator.ComparatorProfit;
 import com.profit.bond.domain.*;
 import com.profit.bond.domain.BondBuyLogExample;
@@ -44,6 +45,67 @@ public class BondServiceImpl implements IBondService {
     private BondStatisticsMapper bondStatisticsMapper;
     @Resource
     private BondStatisticsLogMapper bondStatisticsLogMapper;
+
+    @Override
+    public List<BondBuyLogDTO> getBondBuyLogs(BondBuyLog bondBuyLogRequest){
+        byte status = 0;
+        String id = bondBuyLogRequest.getGpId();
+        Byte type = bondBuyLogRequest.getType();
+        BondInfo bondInfo = bondInfoService.selectBondInfoById(id);
+        BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
+        BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
+        criteria.andGpIdEqualTo(id);
+        criteria.andStatusEqualTo(status);
+        if(type != null){
+            criteria.andTypeEqualTo(type);
+        }
+        bondBuyLogExample.setOrderByClause("price desc");
+
+        List<BondBuyLog> result = bondBuyLogService.selectByExample(bondBuyLogExample);
+        List<BondBuyLogDTO> list = new ArrayList<>(result.size());
+        for (int i = 0; i < result.size(); i++) {
+            BondBuyLog bondBuyLog = result.get(i);
+            //查看是否股票是否全部售出
+            if (bondBuyLog.getCount().intValue() == bondBuyLog.getSellCount().intValue()) {
+                if (bondBuyLog.getStatus() == 0) {
+                    bondBuyLog.setStatus((byte) 1);
+                    bondBuyLogService.updateBondBuyLog(bondBuyLog);
+                }
+            }
+            BondBuyLogDTO buyLogDTO = BeanUtils.copyBean(new BondBuyLogDTO(), bondBuyLog);
+            buyLogDTO.setName(bondInfo.getName());
+            buyLogDTO.setCurPrice(bondInfo.getPrice());
+            //卖出均价
+            loadSellAvgPrice(bondBuyLog, buyLogDTO);
+            //当前持股盈亏
+            loadCurBondIncome(bondInfo, bondBuyLog, buyLogDTO);
+            //与上一个买点的格差
+            String girdSpacing = "0";
+            if (i > 0) {
+                girdSpacing = String.format("%.2f", ((bondBuyLog.getPrice() - result.get(i - 1).getPrice()) / bondBuyLog.getPrice()) * 100) + "%";
+            }
+            buyLogDTO.setGirdSpacing(girdSpacing);
+            if (bondBuyLog.getFinancing() == 1) {
+                buyLogDTO.setName(buyLogDTO.getName() + "(融)");
+                Double lendMoney = ((bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice() - bondBuyLog.getBackMoney()) + bondBuyLog.getBuyCost();
+                Date lendDate;
+                if (bondBuyLog.getBackTime() != null) {
+                    lendDate = bondBuyLog.getBackTime();
+                } else {
+                    lendDate = DateUtils.string2Date(bondBuyLog.getBuyDate(), DateUtils.YYYY_MM_DD);
+                }
+                buyLogDTO.setInterest(BondUtils.countInterest(lendMoney, lendDate));
+            } else {
+                buyLogDTO.setInterest(0.0);
+            }
+
+            list.add(buyLogDTO);
+            if (status == 1) {
+                Collections.sort(list, new ComparatorBondSell());
+            }
+        }
+        return list;
+    }
 
     /**
      * 股票数据

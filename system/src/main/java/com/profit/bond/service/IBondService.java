@@ -46,4 +46,6 @@ public interface IBondService
     EChartsData countProfitByDay();
 
     EChartsData statisticsLog();
+
+    List<BondBuyLogDTO> getBondBuyLogs(BondBuyLog bondBuyLog);
 }
