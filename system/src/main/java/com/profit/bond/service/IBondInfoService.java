@@ -67,4 +67,9 @@ public interface IBondInfoService
      * @return 结果
      */
     public int deleteBondInfoById(String id);
+
+    /**
+     * 更新股票价格
+     */
+    public void refurbishBondPrice();
 }
