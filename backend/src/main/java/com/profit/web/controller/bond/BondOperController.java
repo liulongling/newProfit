@@ -8,10 +8,13 @@ import com.profit.bond.service.IBondBuyLogService;
 import com.profit.bond.service.IBondInfoService;
 import com.profit.bond.service.IBondSellLogService;
 import com.profit.bond.service.IBondService;
+import com.profit.common.annotation.Log;
 import com.profit.common.constant.BondConstants;
 import com.profit.common.constant.ResultCode;
 import com.profit.common.core.controller.BaseController;
+import com.profit.common.core.domain.AjaxResult;
 import com.profit.common.core.page.TableDataInfo;
+import com.profit.common.enums.BusinessType;
 import com.profit.common.utils.BondUtils;
 import com.profit.common.utils.DateUtils;
 import com.profit.common.utils.bean.BeanUtils;
@@ -68,6 +71,18 @@ public class BondOperController extends BaseController {
         BondBuyLog bondBuyLog = bondBuyLogService.selectBondBuyLogById(id);
         mmap.put("bondBuyLog", bondBuyLog);
         return prefix + "/edit";
+    }
+
+    /**
+     * 修改保存股票购买日志
+     */
+    @RequiresPermissions("bond:oper:edit")
+    @Log(title = "股票购买日志", businessType = BusinessType.UPDATE)
+    @PostMapping("/edit")
+    @ResponseBody
+    public AjaxResult editSave(BondBuyLog bondBuyLog)
+    {
+        return toAjax(bondBuyLogService.updateBondBuyLog(bondBuyLog));
     }
 
     @PostMapping("buy")
