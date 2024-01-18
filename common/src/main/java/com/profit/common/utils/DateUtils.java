@@ -4,7 +4,7 @@ import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
-import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
@@ -221,13 +221,13 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
      * @param date2
      * @return
      */
-    public static int compareDateInterval(Date date1, Date date2) {
-        Calendar aCalendar = Calendar.getInstance();
-        aCalendar.setTime(date1);
-        int day1 = aCalendar.get(Calendar.DAY_OF_YEAR);
-        aCalendar.setTime(date2);
-        int day2 = aCalendar.get(Calendar.DAY_OF_YEAR);
-        return day2 - day1;
+    public static long compareDateInterval(Date date1, Date date2) {
+        LocalDate localDate1 = date1.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+        LocalDate localDate11 = LocalDate.of(localDate1.getYear(), localDate1.getMonthValue(), localDate1.getDayOfMonth()); // 第一个日期
+
+        LocalDate localDate2 = date2.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+        LocalDate localDate22 = LocalDate.of(localDate2.getYear(), localDate2.getMonthValue(), localDate2.getDayOfMonth()); // 第二个日期
+        return ChronoUnit.DAYS.between(localDate11, localDate22);
     }
 
     /**

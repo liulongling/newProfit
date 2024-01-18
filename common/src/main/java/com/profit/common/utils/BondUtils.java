@@ -31,7 +31,7 @@ public class BondUtils {
      * @return
      */
     public static Double countInterest(Double lendMoney, Date lendDate) {
-        int lendDay = DateUtils.compareDateInterval(lendDate, new Date());
+        long lendDay = DateUtils.compareDateInterval(lendDate, new Date());
         return Double.parseDouble(String.format("%.2f", lendMoney * (0.05 / 360) * lendDay));
 
     }
