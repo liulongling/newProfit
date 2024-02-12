@@ -37,7 +37,7 @@ var table = {
             init: function(options) {
                 var defaults = {
                     id: "bootstrap-table",
-                    type: 1, // 0 代表bootstrapTable 1代表bootstrapTreeTable
+                    type: 0, // 0 代表bootstrapTable 1代表bootstrapTreeTable
                     method: 'post',
                     height: undefined,
                     sidePagination: "server",
@@ -50,7 +50,7 @@ var table = {
                     pageNumber: 1,
                     pageList: [10, 25, 50],
                     toolbar: "toolbar",
-                    loadingFontSize: 20,
+                    loadingFontSize: 13,
                     striped: false,
                     escape: false,
                     firstLoad: true,
