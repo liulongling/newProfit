@@ -15,8 +15,6 @@ import com.profit.framework.manager.factory.AsyncFactory;
 
 /**
  * 针对自定义的ShiroSession的db操作
- * 
- * 
  */
 public class OnlineSessionDAO extends EnterpriseCacheSessionDAO
 {

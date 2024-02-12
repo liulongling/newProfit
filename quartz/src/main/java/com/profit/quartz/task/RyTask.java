@@ -7,8 +7,6 @@ import com.profit.common.utils.StringUtils;
 
 /**
  * 定时任务调度测试
- * 
- * 
  */
 @Component("ryTask")
 public class RyTask

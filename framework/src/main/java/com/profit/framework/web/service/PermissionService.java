@@ -12,8 +12,6 @@ import com.profit.common.utils.StringUtils;
 
 /**
  *  js调用 thymeleaf 实现按钮权限可见性
- * 
- * 
  */
 @Service("permission")
 public class PermissionService

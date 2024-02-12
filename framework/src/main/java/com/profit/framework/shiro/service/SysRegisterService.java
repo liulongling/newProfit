@@ -17,8 +17,6 @@ import com.profit.system.service.ISysUserService;
 
 /**
  * 注册校验方法
- * 
- * 
  */
 @Component
 public class SysRegisterService

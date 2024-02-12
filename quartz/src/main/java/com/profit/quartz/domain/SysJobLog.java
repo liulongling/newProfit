@@ -8,8 +8,6 @@ import com.profit.common.core.domain.BaseEntity;
 
 /**
  * 定时任务调度日志表 sys_job_log
- * 
- * 
  */
 public class SysJobLog extends BaseEntity
 {

@@ -2,8 +2,6 @@ package com.profit.common.exception.user;
 
 /**
  * 用户不存在异常类
- * 
- * 
  */
 public class UserNotExistsException extends UserException
 {

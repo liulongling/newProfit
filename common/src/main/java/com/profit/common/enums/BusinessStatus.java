@@ -2,8 +2,6 @@ package com.profit.common.enums;
 
 /**
  * 操作状态
- * 
- * 
  */
 public enum BusinessStatus
 {

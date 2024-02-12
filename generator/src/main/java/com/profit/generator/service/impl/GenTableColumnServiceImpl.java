@@ -11,8 +11,6 @@ import com.profit.common.core.text.Convert;
 
 /**
  * 业务字段 服务层实现
- * 
- * 
  */
 @Service
 public class GenTableColumnServiceImpl implements IGenTableColumnService

@@ -2,8 +2,6 @@ package com.profit.common.exception;
 
 /**
  * 工具类异常
- * 
- * 
  */
 public class UtilException extends RuntimeException
 {

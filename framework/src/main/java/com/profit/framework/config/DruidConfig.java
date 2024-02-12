@@ -27,8 +27,6 @@ import com.profit.framework.config.properties.DruidProperties;
 
 /**
  * druid 配置多数据源
- * 
- * 
  */
 @Configuration
 public class DruidConfig

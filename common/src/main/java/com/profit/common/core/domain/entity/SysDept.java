@@ -12,8 +12,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * 部门表 sys_dept
- * 
- * 
  */
 public class SysDept extends BaseEntity
 {

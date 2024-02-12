@@ -2,8 +2,6 @@ package com.profit.common.exception.user;
 
 /**
  * 黑名单IP异常类
- * 
- * 
  */
 public class BlackListException extends UserException
 {

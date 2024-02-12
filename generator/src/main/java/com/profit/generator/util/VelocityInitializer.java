@@ -6,8 +6,6 @@ import com.profit.common.constant.Constants;
 
 /**
  * VelocityEngine工厂
- * 
- * 
  */
 public class VelocityInitializer
 {

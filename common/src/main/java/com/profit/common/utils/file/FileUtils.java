@@ -22,8 +22,6 @@ import com.profit.common.utils.StringUtils;
 
 /**
  * 文件处理工具类
- * 
- * 
  */
 public class FileUtils
 {

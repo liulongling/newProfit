@@ -2,8 +2,6 @@ package com.profit.common.constant;
 
 /**
  * Shiro通用常量
- * 
- * 
  */
 public class ShiroConstants
 {

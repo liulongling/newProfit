@@ -2,8 +2,6 @@ package com.profit.framework.web.domain.server;
 
 /**
  * 系统相关信息
- * 
- * 
  */
 public class Sys
 {

@@ -5,8 +5,6 @@ import com.profit.system.domain.SysOperLog;
 
 /**
  * 操作日志 服务层
- * 
- * 
  */
 public interface ISysOperLogService
 {

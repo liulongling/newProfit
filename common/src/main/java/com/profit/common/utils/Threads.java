@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 线程相关工具类.
- * 
- * 
  */
 public class Threads
 {

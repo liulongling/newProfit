@@ -7,8 +7,6 @@ import com.profit.generator.domain.GenTable;
 
 /**
  * 业务 服务层
- * 
- * 
  */
 public interface IGenTableService
 {

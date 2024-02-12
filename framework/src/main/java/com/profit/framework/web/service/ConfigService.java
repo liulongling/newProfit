@@ -6,8 +6,6 @@ import com.profit.system.service.ISysConfigService;
 
 /**
  * RuoYi首创 html调用 thymeleaf 实现参数管理
- * 
- * 
  */
 @Service("config")
 public class ConfigService

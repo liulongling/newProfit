@@ -13,8 +13,6 @@ import com.profit.framework.interceptor.RepeatSubmitInterceptor;
 
 /**
  * 通用配置
- * 
- * 
  */
 @Configuration
 public class ResourcesConfig implements WebMvcConfigurer

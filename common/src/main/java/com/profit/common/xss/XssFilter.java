@@ -16,8 +16,6 @@ import com.profit.common.utils.StringUtils;
 
 /**
  * 防止XSS攻击的过滤器
- * 
- * 
  */
 public class XssFilter implements Filter
 {

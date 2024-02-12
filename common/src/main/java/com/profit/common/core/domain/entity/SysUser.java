@@ -14,8 +14,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * 用户对象 sys_user
- * 
- * 
  */
 public class SysUser extends BaseEntity
 {

@@ -2,8 +2,6 @@ package com.profit.common.core.domain;
 
 /**
  * Tree基类
- * 
- * 
  */
 public class TreeEntity extends BaseEntity
 {

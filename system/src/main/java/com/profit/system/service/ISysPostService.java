@@ -5,8 +5,6 @@ import com.profit.system.domain.SysPost;
 
 /**
  * 岗位信息 服务层
- * 
- * 
  */
 public interface ISysPostService
 {

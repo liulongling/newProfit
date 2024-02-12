@@ -2,8 +2,6 @@ package com.profit.common.exception.user;
 
 /**
  * 角色锁定异常类
- * 
- * 
  */
 public class RoleBlockedException extends UserException
 {

@@ -14,8 +14,6 @@ import com.profit.system.service.ISysPostService;
 
 /**
  * 岗位信息 服务层处理
- * 
- * 
  */
 @Service
 public class SysPostServiceImpl implements ISysPostService

@@ -6,8 +6,6 @@ import com.profit.common.core.domain.entity.SysDictData;
 
 /**
  * 字典表 数据层
- * 
- * 
  */
 public interface SysDictDataMapper
 {

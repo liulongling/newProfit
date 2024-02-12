@@ -11,8 +11,6 @@ import com.profit.common.core.domain.entity.SysUser;
 
 /**
  * shiro 工具类
- * 
- * 
  */
 public class ShiroUtils
 {

@@ -2,8 +2,6 @@ package com.profit.common.exception.job;
 
 /**
  * 计划策略异常
- * 
- * 
  */
 public class TaskException extends Exception
 {

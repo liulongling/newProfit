@@ -9,8 +9,6 @@ import com.profit.system.service.ISysDictTypeService;
 
 /**
  * RuoYi首创 html调用 thymeleaf 实现字典读取
- * 
- * 
  */
 @Service("dict")
 public class DictService

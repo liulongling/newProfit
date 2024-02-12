@@ -5,8 +5,6 @@ import com.profit.system.domain.SysOperLog;
 
 /**
  * 操作日志 数据层
- * 
- * 
  */
 public interface SysOperLogMapper
 {

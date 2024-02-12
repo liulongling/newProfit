@@ -5,8 +5,6 @@ import com.profit.system.domain.SysRoleMenu;
 
 /**
  * 角色与菜单关联表 数据层
- * 
- * 
  */
 public interface SysRoleMenuMapper
 {

@@ -9,8 +9,6 @@ import com.alibaba.fastjson.JSONObject;
 
 /**
  * 获取地址类
- * 
- * 
  */
 public class AddressUtils
 {

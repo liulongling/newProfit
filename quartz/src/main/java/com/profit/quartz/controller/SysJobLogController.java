@@ -26,8 +26,6 @@ import com.profit.quartz.domain.SysJobLog;
 
 /**
  * 调度日志操作处理
- * 
- * 
  */
 @Controller
 @RequestMapping("/monitor/jobLog")

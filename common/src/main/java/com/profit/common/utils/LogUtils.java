@@ -11,8 +11,6 @@ import com.profit.common.json.JSON;
 
 /**
  * 处理并记录日志文件
- * 
- * 
  */
 public class LogUtils
 {

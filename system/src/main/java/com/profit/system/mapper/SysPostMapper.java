@@ -5,8 +5,6 @@ import com.profit.system.domain.SysPost;
 
 /**
  * 岗位信息 数据层
- * 
- * 
  */
 public interface SysPostMapper
 {

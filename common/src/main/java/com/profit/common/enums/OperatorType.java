@@ -2,8 +2,6 @@ package com.profit.common.enums;
 
 /**
  * 操作人类别
- * 
- * 
  */
 public enum OperatorType
 {

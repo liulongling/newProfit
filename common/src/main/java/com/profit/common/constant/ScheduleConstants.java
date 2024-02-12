@@ -2,8 +2,6 @@ package com.profit.common.constant;
 
 /**
  * 任务调度通用常量
- * 
- * 
  */
 public class ScheduleConstants
 {
