@@ -54,7 +54,7 @@
 		            title: '股票名称',
 		            sortable: true,
 		            formatter: function(value, row, index) {
-		                return '<a href="javascript:void(0)" onclick="detail(\'' + row.id + '\')">' + value + '</a>';
+		                return '<a href="javascript:void(0)" onclick="detail(\'' + row.id + '\',\'' + row.name + '\')">' + value + '</a>';
 		            }
 		        },
 		        {
@@ -114,9 +114,9 @@
 		}
 
 		/*字典列表-详细*/
-		function detail(id) {
+		function detail(id,name) {
 		    var url = prefix + '/detail/' + id;
-		    $.modal.openTab("股票购买日志", url);
+		    $.modal.openTab(name, url);
 		}
 
 	</script>
