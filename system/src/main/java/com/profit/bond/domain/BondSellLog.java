@@ -37,11 +37,6 @@ public class BondSellLog extends BaseEntity
      */
     private Double freeze;
 
-    /**
-     * 利息
-     */
-    private Double interest;
-
     /** 出售数量 */
     @Excel(name = "出售数量")
     private Integer count;
