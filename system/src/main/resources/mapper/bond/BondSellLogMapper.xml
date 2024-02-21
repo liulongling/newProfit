@@ -195,7 +195,20 @@
     <where>
       <![CDATA[income < 0]]>
       <if test="request.startTime != null and request.endTime != null">
-        AND  create_time BETWEEN #{request.startTime} AND #{request.endTime}
+        AND count > 0 AND  create_time BETWEEN #{request.startTime} AND #{request.endTime}
+      </if>
+    </where>
+  </select>
+
+  <select id="sumInterest" resultType="java.lang.Double">
+    SELECT
+    IFNULL(sum(income),0)
+    FROM
+    bond_sell_log
+    <where>
+      <![CDATA[income < 0]]>
+      <if test="request.startTime != null and request.endTime != null">
+        AND count = 0 AND  create_time BETWEEN #{request.startTime} AND #{request.endTime}
       </if>
     </where>
   </select>

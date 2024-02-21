@@ -78,12 +78,20 @@ public interface BondSellLogMapper {
     Double sumIncome(@Param("request") BondSellRequestDTO request);
 
     /**
-     * 亏损基恩
+     * 亏损金额
      *
      * @param request
      * @return
      */
     Double sumLossIncome(@Param("request") BondSellRequestDTO request);
+
+    /**
+     *  支出利息
+     *
+     * @param request
+     * @return
+     */
+    Double sumInterest(@Param("request") BondSellRequestDTO request);
 
     List<BondSellLog> selectByExample(BondSellLogExample bondSellLogExample);
 }

@@ -113,6 +113,7 @@ public class BondServiceImpl implements IBondService {
      * @param gpId null 查所有股票
      * @return
      */
+    @Override
     public StatisticsDTO loadStatisticsDTO(String gpId, Date startDate, Date endDate) {
         StatisticsDTO statisticsDTO = new StatisticsDTO();
         //查询收益情况
@@ -134,6 +135,10 @@ public class BondServiceImpl implements IBondService {
         bondSellRequestDTO.setStartTime(DateUtils.getTimeString(startDate));
         bondSellRequestDTO.setEndTime(DateUtils.getTimeString(endDate));
         statisticsDTO.setLossProfit(Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumLossIncome(bondSellRequestDTO))));
+
+        //利息
+        double interest = Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumInterest(bondSellRequestDTO)));
+        statisticsDTO.setInterest(-interest);
 
         //查询买入金额
         List<BondBuyLog> buyLogs = getBondBuyLogs(gpId, DateUtils.getDateString(startDate, DateUtils.YYYY_MM_DD), DateUtils.getDateString(endDate, DateUtils.YYYY_MM_DD));
@@ -440,6 +445,7 @@ public class BondServiceImpl implements IBondService {
     public List<BondSellLog> getBondSellLogs(String gpId, Date startDate, Date endDate) {
         BondSellLogExample bondSellLogExample = new BondSellLogExample();
         BondSellLogExample.Criteria criteria = bondSellLogExample.createCriteria();
+        criteria.andCountGreaterThan(0);
         criteria.andCreateTimeBetween(startDate, endDate);
         if (gpId != null) {
             criteria.andGpIdEqualTo(gpId);

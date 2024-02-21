@@ -247,32 +247,40 @@
 			<div class="col-sm-3">
 				<div class="ibox">
 					<div class="ibox-content">
-						<h5>佣金税费</h5>
-						<h1 class="no-margins" th:text="*{today.cost}"></h1>
+						<h5>佣金税费/利息</h5>
+						<span style="font-size:26px" th:text="*{today.cost}"></span>
+						<span style="font-size:26px" >/</span>
+						<span style="font-size:26px" th:text="*{today.interest}"></span>
 					</div>
 				</div>
 			</div>
 			<div class="col-sm-3">
 				<div class="ibox">
 					<div class="ibox-content">
-						<h5>佣金税费</h5>
-						<h1 class="no-margins" th:text="*{month.cost}"></h1>
+						<h5>佣金税费/利息</h5>
+						<span style="font-size:26px" th:text="*{month.cost}"></span>
+						<span style="font-size:26px" >/</span>
+						<span style="font-size:26px" th:text="*{month.interest}"></span>
 					</div>
 				</div>
 			</div>
 			<div class="col-sm-3">
 				<div class="ibox">
 					<div class="ibox-content">
-						<h5>佣金税费</h5>
-						<h1 class="no-margins" th:text="*{year.cost}"></h1>
+						<h5>佣金税费/利息</h5>
+						<span style="font-size:26px" th:text="*{year.cost}"></span>
+						<span style="font-size:26px" >/</span>
+						<span style="font-size:26px" th:text="*{year.interest}"></span>
 					</div>
 				</div>
 			</div>
 			<div class="col-sm-3">
 				<div class="ibox">
 					<div class="ibox-content">
-						<h5>佣金税费</h5>
-						<h1 class="no-margins" th:text="*{total.cost}"></h1>
+						<h5>佣金税费/利息</h5>
+						<span style="font-size:26px" th:text="*{total.cost}"></span>
+						<span style="font-size:26px" >/</span>
+						<span style="font-size:26px" th:text="*{total.interest}"></span>
 					</div>
 				</div>
 			</div>

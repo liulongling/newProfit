@@ -28,6 +28,10 @@ public class StatisticsDTO {
      */
     private Double lossProfit;
     /**
+     * 利息
+     */
+    private Double interest;
+    /**
      * 佣金费用
      */
     private Double cost;
