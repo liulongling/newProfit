@@ -658,11 +658,22 @@ public class BondServiceImpl implements IBondService {
     public BondInfoDTO loadBondInfoDTO(BondInfo bondInfo) {
         BondInfoDTO bondInfoDTO = BeanUtils.copyBean(new BondInfoDTO(), bondInfo);
         Double stubProfit = bondBuyLogMapper.sumSellIncome(bondInfo.getId(), (byte) 1);
-        if (stubProfit == null) stubProfit = 0.00;
+        if (stubProfit == null){
+            stubProfit = 0.00;
+        }
         bondInfoDTO.setStubProfit(Double.parseDouble(String.format("%.2f", stubProfit)));
         Double gridProfit = bondBuyLogMapper.sumSellIncome(bondInfo.getId(), (byte) 0);
-        if (gridProfit == null) gridProfit = 0.00;
+        if (gridProfit == null){
+            gridProfit = 0.00;
+        }
+
         bondInfoDTO.setGridProfit(Double.parseDouble(String.format("%.2f", gridProfit)));
+
+        Double superProfit = bondBuyLogMapper.sumSellIncome(bondInfo.getId(), (byte) 2);
+        if (superProfit == null) {
+            superProfit = 0.00;
+        }
+        bondInfoDTO.setSuperProfit(Double.parseDouble(String.format("%.2f", superProfit)));
 
         bondInfoDTO.setStubCount(getBondNumber(bondInfo, BondConstants.SHORT_LINE));
         bondInfoDTO.setGridCount(getBondNumber(bondInfo, BondConstants.LONG_LINE));
