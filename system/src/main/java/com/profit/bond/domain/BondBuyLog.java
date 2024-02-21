@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.profit.common.utils.BondUtils;
 import com.profit.common.utils.DateUtils;
 import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -128,5 +129,38 @@ public class BondBuyLog extends BaseEntity
     @JSONField(serialize = false, deserialize = false)
     public void addRemarks(Double backMoney, Double intersert) {
         remarks += DateUtils.getDateString(backTime, DateUtils.YYYYMMDDHHMMSS) + "归还金额" + backMoney + "利息:" + intersert + ";";
+    }
+
+
+    @JSONField(serialize = false, deserialize = false)
+    public double countInterest() {
+        double interest = this.interest;
+        if (financing == 1) {
+            Date lendDate;
+            if (backTime != null) {
+                lendDate = backTime;
+            } else {
+                lendDate = DateUtils.string2Date(buyDate, DateUtils.YYYY_MM_DD);
+            }
+            Double lendMoney = (count - sellCount * price - backMoney) + buyCost;
+            interest += BondUtils.countInterest(lendMoney, lendDate);
+        }
+
+        return interest;
+    }
+
+    @JSONField(serialize = false, deserialize = false)
+    public double notbackInterest() {
+        if (financing == 1) {
+            Date lendDate;
+            if (backTime != null) {
+                lendDate = backTime;
+            } else {
+                lendDate = DateUtils.string2Date(buyDate, DateUtils.YYYY_MM_DD);
+            }
+            Double lendMoney = (count - sellCount * price - backMoney) + buyCost;
+            return BondUtils.countInterest(lendMoney, lendDate);
+        }
+        return 0;
     }
 }
