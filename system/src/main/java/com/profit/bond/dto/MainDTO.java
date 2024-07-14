@@ -11,6 +11,7 @@ import lombok.Data;
 public class MainDTO {
     private StatisticsDTO today = new StatisticsDTO();
     private StatisticsDTO month = new StatisticsDTO();
+    private StatisticsDTO lastMonth = new StatisticsDTO();
     private StatisticsDTO year = new StatisticsDTO();
     private StatisticsDTO total = new StatisticsDTO();
 }

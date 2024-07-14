@@ -47,7 +47,7 @@ public class BondServiceImpl implements IBondService {
     private BondStatisticsLogMapper bondStatisticsLogMapper;
 
     @Override
-    public List<BondBuyLogDTO> getBondBuyLogs(BondBuyLog bondBuyLogRequest){
+    public List<BondBuyLogDTO> getBondBuyLogs(BondBuyLog bondBuyLogRequest) {
         byte status = 0;
         String id = bondBuyLogRequest.getGpId();
         Byte type = bondBuyLogRequest.getType();
@@ -56,7 +56,7 @@ public class BondServiceImpl implements IBondService {
         BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
         criteria.andGpIdEqualTo(id);
         criteria.andStatusEqualTo(status);
-        if(type != null){
+        if (type != null) {
             criteria.andTypeEqualTo(type);
         }
         bondBuyLogExample.setOrderByClause("price desc");
@@ -87,24 +87,102 @@ public class BondServiceImpl implements IBondService {
             buyLogDTO.setGirdSpacing(girdSpacing);
             if (bondBuyLog.getFinancing() == 1) {
                 buyLogDTO.setName(buyLogDTO.getName() + "(融)");
-                Double lendMoney = ((bondBuyLog.getCount() - bondBuyLog.getSellCount()) * bondBuyLog.getPrice() - bondBuyLog.getBackMoney()) + bondBuyLog.getBuyCost();
-                Date lendDate;
-                if (bondBuyLog.getBackTime() != null) {
-                    lendDate = bondBuyLog.getBackTime();
-                } else {
-                    lendDate = DateUtils.string2Date(bondBuyLog.getBuyDate(), DateUtils.YYYY_MM_DD);
-                }
-                buyLogDTO.setInterest(BondUtils.countInterest(lendMoney, lendDate));
-            } else {
-                buyLogDTO.setInterest(0.0);
             }
-
+            buyLogDTO.setInterest(bondBuyLog.countInterest());
             list.add(buyLogDTO);
             if (status == 1) {
                 Collections.sort(list, new ComparatorBondSell());
             }
         }
         return list;
+    }
+
+    @Override
+    public TodayTaxationDTO loadToadyTaxationDTO(String gpId) {
+        TodayTaxationDTO todayTaxationDTO = new TodayTaxationDTO();
+        //今日出售总收益
+        Map<Object, Object> todayProfitMap = getProfitByDate(DateUtils.getTime(new Date(), 0, 0, 0), DateUtils.getTime(new Date(), 23, 59, 59));
+        Double profit = 0.00;
+        if (todayProfitMap != null) {
+            for (Object key : todayProfitMap.keySet()) {
+                if (gpId == null) {
+                    profit += Double.parseDouble(String.format("%.2f", todayProfitMap.get(key)));
+                } else {
+                    if (key.equals(gpId)) {
+                        profit = Double.parseDouble(String.format("%.2f", todayProfitMap.get(key)));
+                        break;
+                    }
+                }
+            }
+        }
+        todayTaxationDTO.setTodayProfit(Double.parseDouble(String.format("%.2f", profit)));
+
+        //今日止损
+        BondSellRequestDTO bondSellRequest = new BondSellRequestDTO();
+        bondSellRequest.setStartTime(DateUtils.getTimeString(DateUtils.getTime(new Date(), 0, 0, 0)));
+        bondSellRequest.setEndTime(DateUtils.getTimeString(DateUtils.getTime(new Date(), 23, 59, 59)));
+        todayTaxationDTO.setTodayLossProfit(Double.parseDouble(String.format("%.2f", bondSellLogMapper.sumLossIncome(bondSellRequest))));
+
+
+        List<BondBuyLog> buyLogs = getBondBuyLogs(gpId, DateUtils.getTimeString(new Date(), 0, 0, 0), DateUtils.getTimeString(new Date(), 23, 59, 59));
+        Double buyAmount = 0.0;
+        int buyNumber = 0;
+        if (buyLogs != null) {
+            for (BondBuyLog bondBuyLog : buyLogs) {
+                buyAmount += bondBuyLog.getPrice() * bondBuyLog.getCount();
+                buyNumber++;
+            }
+        }
+        todayTaxationDTO.setBuyAmount(Double.parseDouble(String.format("%.2f", buyAmount)));
+
+        List<BondSellLog> sellLogs = getBondSellLogs(gpId, DateUtils.getTime(new Date(), 0, 0, 0), DateUtils.getTime(new Date(), 23, 59, 59));
+        Double sellAmount = 0.0;
+        Double cost = 0.0;
+        Double maxProfit = 0.0;
+        Double maxLoss = 0.0;
+        if (buyLogs != null) {
+            for (BondSellLog bondSellLog : sellLogs) {
+                if (bondSellLog.getIncome() > 0) {
+                    todayTaxationDTO.incrProfitNumber();
+                } else {
+                    todayTaxationDTO.incrPlossNumber();
+                }
+                if (bondSellLog.getIncome() > maxProfit) {
+                    maxProfit = bondSellLog.getIncome();
+                }
+                if (bondSellLog.getIncome() < maxLoss) {
+                    maxLoss = bondSellLog.getIncome();
+                }
+                sellAmount += bondSellLog.getPrice() * bondSellLog.getCount();
+                cost += bondSellLog.getCost();
+            }
+        }
+        todayTaxationDTO.setSellAmount(Double.parseDouble(String.format("%.2f", sellAmount)));
+        todayTaxationDTO.setCost(Double.parseDouble(String.format("%.2f", cost)));
+        todayTaxationDTO.setBuyNumber(buyNumber);
+        todayTaxationDTO.setMaxProfit(maxProfit);
+        todayTaxationDTO.setMaxLoss(maxLoss);
+        todayTaxationDTO.setTransactionAmount(Double.parseDouble(String.format("%.2f", buyAmount + sellAmount)));
+        if (todayTaxationDTO.getTotalNumber() > 0) {
+            todayTaxationDTO.setWinning(StringUtils.pencentWin(todayTaxationDTO.getProfitNumber(), todayTaxationDTO.getTotalNumber()));
+        }
+        return todayTaxationDTO;
+    }
+
+    @Override
+    public Long getBondNumber(BondInfo bondInfo, Byte type) {
+        long buyCount = 0, sellCount = 0;
+        Map<Object, Object> map = bondBuyLogMapper.sumBuySellCount(bondInfo.getId(), type);
+        if (map != null) {
+            for (Object o : map.keySet()) {
+                if (o.equals("buyCount")) {
+                    buyCount = Long.valueOf(map.get(o).toString());
+                } else if (o.equals("sellCount")) {
+                    sellCount = Long.valueOf(map.get(o).toString());
+                }
+            }
+        }
+        return buyCount - sellCount;
     }
 
     /**
@@ -526,11 +604,11 @@ public class BondServiceImpl implements IBondService {
             int surplusCount = bondBuyLog.getCount() - bondBuyLog.getSellCount();
             Double curIncome = bondInfo.getPrice() * surplusCount - bondBuyLog.getPrice() * surplusCount;
             //当前收益 扣除佣金税费
-            curIncome -= BondUtils.getTaxation( bondInfo.getPlate(), bondInfo.getIsEtf(), surplusCount * bondInfo.getPrice(), true);
-            curIncome -= BondUtils.getTaxation( bondInfo.getPlate(), bondInfo.getIsEtf(), surplusCount * bondBuyLog.getPrice(), false);
+            curIncome -= BondUtils.getTaxation(bondInfo.getPlate(), bondInfo.getIsEtf(), surplusCount * bondInfo.getPrice(), true);
+            curIncome -= BondUtils.getTaxation(bondInfo.getPlate(), bondInfo.getIsEtf(), surplusCount * bondBuyLog.getPrice(), false);
             //当前收益 扣除未还利息
             if (bondBuyLog.getFinancing() == 1) {
-                Double rzfz = (surplusCount * bondBuyLog.getPrice()) + BondUtils.getTaxation( bondInfo.getPlate(), bondInfo.getIsEtf(), surplusCount * bondBuyLog.getPrice(), false);
+                Double rzfz = (surplusCount * bondBuyLog.getPrice()) + BondUtils.getTaxation(bondInfo.getPlate(), bondInfo.getIsEtf(), surplusCount * bondBuyLog.getPrice(), false);
                 Date lendDate;
                 if (bondBuyLog.getBackTime() != null) {
                     lendDate = bondBuyLog.getBackTime();
@@ -559,7 +637,7 @@ public class BondServiceImpl implements IBondService {
 
         if (bondBuyLog.getStatus() != null && bondBuyLog.getStatus() != 3) {
             bondBuyLog.setBuyDate(bondBuyLog.getBuyDate());
-            double cost = BondUtils.getTaxation( bondInfo.getPlate(), bondInfo.getIsEtf(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
+            double cost = BondUtils.getTaxation(bondInfo.getPlate(), bondInfo.getIsEtf(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
             bondBuyLog.setCost(Double.parseDouble(String.format("%.2f", cost)));
             bondBuyLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondBuyLog.getPrice() * bondBuyLog.getCount())));
 
@@ -587,12 +665,12 @@ public class BondServiceImpl implements IBondService {
         BondInfo bondInfo = bondInfoService.selectBondInfoById(bondBuyLog.getGpId());
 
         //卖出税费计算
-        double sellTaxation = BondUtils.getTaxation( bondInfo.getPlate(), bondInfo.getIsEtf(), bondSellLog.getPrice() * bondSellLog.getCount(), true);
+        double sellTaxation = BondUtils.getTaxation(bondInfo.getPlate(), bondInfo.getIsEtf(), bondSellLog.getPrice() * bondSellLog.getCount(), true);
         bondSellLog.setCost(sellTaxation);
         bondBuyLog.setCost(Double.parseDouble(String.format("%.2f", bondBuyLog.getCost() + bondSellLog.getCost())));
 
         //买入税费计算
-        double buyTaxation = BondUtils.getTaxation( bondInfo.getPlate(), bondInfo.getIsEtf(), bondBuyLog.getPrice() * bondSellLog.getCount(), false);
+        double buyTaxation = BondUtils.getTaxation(bondInfo.getPlate(), bondInfo.getIsEtf(), bondBuyLog.getPrice() * bondSellLog.getCount(), false);
         //计算收益 出售总价 - 买入总价 - 买卖费用
         double income = bondSellLog.getPrice() * bondSellLog.getCount() - bondBuyLog.getPrice() * bondSellLog.getCount() - bondSellLog.getCost() - buyTaxation;
 
@@ -675,12 +753,12 @@ public class BondServiceImpl implements IBondService {
     public BondInfoDTO loadBondInfoDTO(BondInfo bondInfo) {
         BondInfoDTO bondInfoDTO = BeanUtils.copyBean(new BondInfoDTO(), bondInfo);
         Double stubProfit = bondBuyLogMapper.sumSellIncome(bondInfo.getId(), (byte) 1);
-        if (stubProfit == null){
+        if (stubProfit == null) {
             stubProfit = 0.00;
         }
         bondInfoDTO.setStubProfit(Double.parseDouble(String.format("%.2f", stubProfit)));
         Double gridProfit = bondBuyLogMapper.sumSellIncome(bondInfo.getId(), (byte) 0);
-        if (gridProfit == null){
+        if (gridProfit == null) {
             gridProfit = 0.00;
         }
 

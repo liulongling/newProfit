@@ -48,4 +48,8 @@ public interface IBondService
     EChartsData statisticsLog();
 
     List<BondBuyLogDTO> getBondBuyLogs(BondBuyLog bondBuyLog);
+
+    TodayTaxationDTO loadToadyTaxationDTO(String gpId);
+
+    Long getBondNumber(BondInfo bondInfo, Byte longLine);
 }

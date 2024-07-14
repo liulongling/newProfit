@@ -4,6 +4,7 @@ import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
@@ -27,13 +28,52 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     public static String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
 
     public static String YYYYMMDD = "yyyyMMdd";
+    public static final int ONE_DAY_SEC = 24 * 60 * 60;//一天(秒)
 
     public static String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+    private static final DateTimeFormatter FORMATTER_DATE = DateTimeFormatter.ofPattern(DateUtils.YYYY_MM_DD).withLocale(Locale.getDefault());
 
     private static String[] parsePatterns = {
             "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM", 
             "yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm", "yyyy/MM",
             "yyyy.MM.dd", "yyyy.MM.dd HH:mm:ss", "yyyy.MM.dd HH:mm", "yyyy.MM"};
+
+    public static String formatDate(LocalDateTime dateTime) {
+        return DateUtils.FORMATTER_DATE.format(dateTime);
+    }
+
+    public static LocalDateTime parse(int unixTimeStamp) {
+        return LocalDateTime.ofInstant(Instant.ofEpochSecond(unixTimeStamp), ZoneId.systemDefault());
+    }
+
+    public static String formatDate(int dateTime) {
+        return DateUtils.formatDate(DateUtils.parse(dateTime));
+    }
+
+    public static List<String> getDateList(int startTime, int endTime) {
+        if (startTime == endTime) {
+            return new ArrayList<>() {{
+                this.add(DateUtils.formatDate(startTime));
+            }};
+        }
+        Set<String> set = new HashSet<>();
+        List<String> list = new ArrayList<>();
+        int time = startTime;
+        while (time < endTime) {
+            String date = DateUtils.formatDate(time);
+            if (!set.contains(date)) {
+                set.add(DateUtils.formatDate(time));
+                list.add(date);
+            }
+            time += ONE_DAY_SEC;
+        }
+        String date = DateUtils.formatDate(time);
+        if (!set.contains(date)) {
+            set.add(DateUtils.formatDate(time));
+            list.add(date);
+        }
+        return list;
+    }
 
     /**
      * 获取当年的第一天
@@ -316,6 +356,23 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
         calendar.set(Calendar.MINUTE, minute);
         calendar.set(Calendar.SECOND, second);
         return calendar.getTime();
+    }
+
+    /**
+     * 获取当天指定时间
+     *
+     * @param hour   几点
+     * @param minute 分钟
+     * @param second 秒
+     * @return
+     */
+    public static String getTimeString(Date date, int hour, int minute, int second) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, second);
+        return getTimeString(calendar.getTime());
     }
 
     public static String getTimeString(Date date) {

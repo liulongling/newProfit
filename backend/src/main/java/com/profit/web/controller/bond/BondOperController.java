@@ -1,5 +1,6 @@
 package com.profit.web.controller.bond;
 
+import com.profit.bond.comparator.ComparatorBondSell;
 import com.profit.bond.domain.*;
 import com.profit.bond.dto.BondBuyLogDTO;
 import com.profit.bond.dto.BondBuyRequest;
@@ -52,13 +53,100 @@ public class BondOperController extends BaseController {
         return prefix + "/transactionLogs";
     }
 
-    @PostMapping("/list")
-    @ResponseBody
-    public TableDataInfo list(BondBuyLog bondBuyLog)
-    {
+    /**
+     * 购买股票信息
+     */
+    @GetMapping("/add/{id}")
+    public String add(@PathVariable("id}") Long id, ModelMap mmap) {
+        BondBuyLog bondBuyLog = bondBuyLogService.selectBondBuyLogById(id);
+        //查询股票当前价格
+        BondInfo bondInfo = bondInfoService.selectBondInfoById(bondBuyLog.getGpId());
+        if (bondInfo != null) {
+            bondBuyLog.setPrice(bondInfo.getPrice());
+        }
+        mmap.put("buyLog", bondBuyLog);
+        return prefix + "/add";
+    }
+
+//    @PostMapping("/list")
+//    @ResponseBody
+//    public TableDataInfo list(BondBuyLog bondBuyLog) {
+//        startPage();
+//        List<BondBuyLogDTO> list = bondService.getBondBuyLogs(bondBuyLog);
+//        return getDataTable(list);
+//    }
+
+    @GetMapping("list")
+    public TableDataInfo list(@RequestParam Map<String, Object> params) {
         startPage();
-        List<BondBuyLogDTO> list = bondService.getBondBuyLogs(bondBuyLog);
+        String id = params.get("id").toString();
+        BondInfo bondInfo = bondInfoService.selectBondInfoById(id);
+        BondBuyLogExample bondBuyLogExample = new BondBuyLogExample();
+        BondBuyLogExample.Criteria criteria = bondBuyLogExample.createCriteria();
+        criteria.andGpIdEqualTo(id);
+        bondBuyLogExample.setOrderByClause("oper_time desc");
+        if (params.get("type") != null) {
+            criteria.andTypeEqualTo(Byte.valueOf(params.get("type").toString()));
+            if (params.get("type").equals("0")) {
+                bondBuyLogExample.setOrderByClause("price desc");
+            }
+        }
+
+        byte status = 0;
+        if (params.get("status") != null) {
+            status = Byte.valueOf(params.get("status").toString());
+            criteria.andStatusEqualTo(status);
+            bondBuyLogExample.setOrderByClause("price desc");
+        }
+
+        List<BondBuyLog> result = bondBuyLogService.selectByExample(bondBuyLogExample);
+        List<BondBuyLogDTO> list = new ArrayList<>(result.size());
+        for (int i = 0; i < result.size(); i++) {
+            BondBuyLog bondBuyLog = result.get(i);
+            //查看是否股票是否全部售出
+            if (bondBuyLog.getCount().intValue() == bondBuyLog.getSellCount().intValue()) {
+                if (bondBuyLog.getStatus() == 0) {
+                    bondBuyLog.setStatus((byte) 1);
+                    bondBuyLogService.updateBondBuyLog(bondBuyLog);
+                }
+            }
+            BondBuyLogDTO buyLogDTO = BeanUtils.copyBean(new BondBuyLogDTO(), bondBuyLog);
+            buyLogDTO.setName(bondInfo.getName());
+            //卖出均价
+            bondService.loadSellAvgPrice(bondBuyLog, buyLogDTO);
+            //当前持股盈亏
+            bondService.loadCurBondIncome(bondInfo, bondBuyLog, buyLogDTO);
+            //与上一个买点的格差
+            String girdSpacing = "0";
+            if (i > 0) {
+                girdSpacing = String.format("%.2f", ((bondBuyLog.getPrice() - result.get(i - 1).getPrice()) / bondBuyLog.getPrice()) * 100) + "%";
+            }
+            buyLogDTO.setGirdSpacing(girdSpacing);
+            buyLogDTO.setSubCount(bondBuyLog.getCount() - bondBuyLog.getSellCount());
+            if (bondBuyLog.getFinancing() == 1) {
+                buyLogDTO.setName(buyLogDTO.getName() + "(融)");
+            }
+            buyLogDTO.setInterest(bondBuyLog.countInterest());
+
+            list.add(buyLogDTO);
+            if (status == 1) {
+                Collections.sort(list, new ComparatorBondSell());
+            }
+        }
+
         return getDataTable(list);
+    }
+
+
+    /**
+     * 修改股票购买日志
+     */
+    @RequiresPermissions("bond:oper:remove")
+    @GetMapping("/remove/{id}")
+    public String sell(@PathVariable("id") Long id, ModelMap mmap) {
+        BondBuyLog bondBuyLog = bondBuyLogService.selectBondBuyLogById(id);
+        mmap.put("bondBuyLog", bondBuyLog);
+        return prefix + "/sell";
     }
 
     /**
@@ -66,8 +154,7 @@ public class BondOperController extends BaseController {
      */
     @RequiresPermissions("bond:oper:edit")
     @GetMapping("/edit/{id}")
-    public String edit(@PathVariable("id") Long id, ModelMap mmap)
-    {
+    public String edit(@PathVariable("id") Long id, ModelMap mmap) {
         BondBuyLog bondBuyLog = bondBuyLogService.selectBondBuyLogById(id);
         mmap.put("bondBuyLog", bondBuyLog);
         return prefix + "/edit";
@@ -80,8 +167,7 @@ public class BondOperController extends BaseController {
     @Log(title = "股票购买日志", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(BondBuyLog bondBuyLog)
-    {
+    public AjaxResult editSave(BondBuyLog bondBuyLog) {
         return toAjax(bondBuyLogService.updateBondBuyLog(bondBuyLog));
     }
 
@@ -142,7 +228,7 @@ public class BondOperController extends BaseController {
 
         //未出售的状态下才能修改税费
         if (bondBuyLog.getStatus() == BondConstants.NOT_SELL) {
-            Double buyCost = BondUtils.getTaxation(bondInfo.getPlate(),bondInfo.getIsEtf(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
+            Double buyCost = BondUtils.getTaxation(bondInfo.getPlate(), bondInfo.getIsEtf(), bondBuyLog.getPrice() * bondBuyLog.getCount(), false);
             bondBuyLog.setCost(Double.parseDouble(String.format("%.2f", buyCost)));
             bondBuyLog.setBuyCost(Double.parseDouble(String.format("%.2f", buyCost)));
             bondBuyLog.setTotalPrice(Double.parseDouble(String.format("%.2f", bondBuyLogRequest.getPrice() * bondBuyLogRequest.getCount())));

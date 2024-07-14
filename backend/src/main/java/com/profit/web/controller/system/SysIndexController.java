@@ -129,12 +129,22 @@ public class SysIndexController extends BaseController {
         MainDTO mainDTO = new MainDTO();
         mainDTO.setToday(bondService.loadStatisticsDTO(null, DateUtils.getTime(new Date(), 0, 0, 0), DateUtils.getTime(new Date(), 23, 59, 59)));
         mainDTO.setMonth(bondService.loadStatisticsDTO(null, DateUtils.getMonthStart(), DateUtils.getMonthEnd()));
+        try {
+            mainDTO.setLastMonth(bondService.loadStatisticsDTO(null, DateUtils.getLastMonthTime().get("startDate"), DateUtils.getLastMonthTime().get("endDate")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         mainDTO.setYear(bondService.loadStatisticsDTO(null, DateUtils.getCurrentFirstOfYear(), DateUtils.getCurrentLastOfYear()));
         mainDTO.setTotal(bondService.loadStatisticsDTO(null, DateUtils.string2Date("2020-01-01",DateUtils.YYYY_MM_DD), DateUtils.string2Date("2028-01-01",DateUtils.YYYY_MM_DD)));
         mmap.put("main", mainDTO);
 
         mmap.put("todayList", bondService.getBondProfits(DateUtils.getTime(new Date(), 0, 0, 0), DateUtils.getTime(new Date(), 23, 59, 59)));
         mmap.put("monthList", bondService.getBondProfits(DateUtils.getMonthStart(), DateUtils.getMonthEnd()));
+        try {
+            mmap.put("lastMonthList", bondService.getBondProfits(DateUtils.getLastMonthTime().get("startDate"), DateUtils.getLastMonthTime().get("endDate")));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         mmap.put("yearList", bondService.getBondProfits(DateUtils.getCurrentFirstOfYear(), DateUtils.getCurrentLastOfYear()));
         mmap.put("totalList", bondService.getBondProfits(DateUtils.string2Date("2020-01-01",DateUtils.YYYY_MM_DD), DateUtils.string2Date("2028-01-01",DateUtils.YYYY_MM_DD)));
         return "main";

@@ -1,5 +1,6 @@
 package com.profit.quartz.task;
 
+import com.profit.bond.service.IBondDealService;
 import com.profit.bond.service.IBondInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,7 +14,8 @@ public class RyTask
 {
     @Autowired
     private IBondInfoService bondInfoService;
-
+    @Autowired
+    private IBondDealService bondDealService;
 
     public void ryMultipleParams(String s, Boolean b, Long l, Double d, Integer i)
     {
@@ -27,6 +29,8 @@ public class RyTask
 
     public void ryNoParams()
     {
-        bondInfoService.refurbishBondPrice();
+//        bondInfoService.refurbishBondPrice();
+
+//        bondDealService.refurbishBondDeal();
     }
 }

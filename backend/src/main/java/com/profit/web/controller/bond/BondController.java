@@ -1,10 +1,20 @@
 package com.profit.web.controller.bond;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.profit.bond.dto.TodayTaxationDTO;
 import com.profit.bond.service.IBondService;
+import com.profit.common.constant.BondConstants;
+import com.profit.common.utils.BondUtils;
+import com.profit.common.utils.DateUtils;
+import com.profit.common.utils.http.HttpUtils;
+import com.profit.web.vo.BondInfoVo;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +29,9 @@ import com.profit.bond.service.IBondInfoService;
 import com.profit.common.core.controller.BaseController;
 import com.profit.common.core.domain.AjaxResult;
 import com.profit.common.core.page.TableDataInfo;
+import org.springframework.web.client.RestTemplate;
+
+import javax.annotation.Resource;
 
 /**
  * 股票信息Controller
@@ -58,13 +71,12 @@ public class BondController extends BaseController {
      */
     @RequiresPermissions("system:manager:list")
     @GetMapping("/detail/{id}")
-    public String detail(@PathVariable("id") String id, ModelMap mmap)
-    {
+    public String detail(@PathVariable("id") String id, ModelMap mmap) {
         mmap.put("bond", bondInfoService.selectBondInfoById(id));
         BondInfo bondInfo = new BondInfo();
         bondInfo.setStatus(0);
         mmap.put("bondList", bondInfoService.selectBondInfoList(bondInfo));
-        return "/bond/oper/data";
+        return "/bond/oper/oper";
     }
 
     /**
@@ -73,9 +85,9 @@ public class BondController extends BaseController {
     @RequiresPermissions("bond:manager:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(BondInfo bondInfo) {
+    public TableDataInfo list(BondInfo bondInfoRequest) {
         startPage();
-        List<BondInfo> list = bondInfoService.selectBondInfoList(bondInfo);
+        List<BondInfo> list = bondInfoService.selectBondInfoList(bondInfoRequest);
         return getDataTable(list);
     }
 

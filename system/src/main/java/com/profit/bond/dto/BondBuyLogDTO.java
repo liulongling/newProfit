@@ -13,6 +13,7 @@ public class BondBuyLogDTO extends BondBuyLog {
     public String sellDate;
     public Double income;
     public Double curPrice;
+    public Integer subCount;
 
     public String getTypeName() {
         return getType() == 1 ? "短线" : "长线";

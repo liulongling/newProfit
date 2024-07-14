@@ -21,13 +21,12 @@ import javax.annotation.Resource;
 
 /**
  * 股票信息Service业务层处理
- * 
+ *
  * @author liulongling
  * @date 2023-12-10
  */
 @Service
-public class BondInfoServiceImpl implements IBondInfoService 
-{
+public class BondInfoServiceImpl implements IBondInfoService {
     @Autowired
     private BondInfoMapper bondInfoMapper;
     @Resource
@@ -42,75 +41,69 @@ public class BondInfoServiceImpl implements IBondInfoService
 
     /**
      * 查询股票信息
-     * 
+     *
      * @param id 股票信息主键
      * @return 股票信息
      */
     @Override
-    public BondInfo selectBondInfoById(String id)
-    {
+    public BondInfo selectBondInfoById(String id) {
         return bondInfoMapper.selectBondInfoById(id);
     }
 
     /**
      * 查询股票信息列表
-     * 
+     *
      * @param bondInfo 股票信息
      * @return 股票信息
      */
     @Override
-    public List<BondInfo> selectBondInfoList(BondInfo bondInfo)
-    {
+    public List<BondInfo> selectBondInfoList(BondInfo bondInfo) {
         return bondInfoMapper.selectBondInfoList(bondInfo);
     }
 
     /**
      * 新增股票信息
-     * 
+     *
      * @param bondInfo 股票信息
      * @return 结果
      */
     @Override
-    public int insertBondInfo(BondInfo bondInfo)
-    {
+    public int insertBondInfo(BondInfo bondInfo) {
         bondInfo.setCreateTime(DateUtils.getNowDate());
         return bondInfoMapper.insertBondInfo(bondInfo);
     }
 
     /**
      * 修改股票信息
-     * 
+     *
      * @param bondInfo 股票信息
      * @return 结果
      */
     @Override
-    public int updateBondInfo(BondInfo bondInfo)
-    {
+    public int updateBondInfo(BondInfo bondInfo) {
         bondInfo.setUpdateTime(DateUtils.getNowDate());
         return bondInfoMapper.updateBondInfo(bondInfo);
     }
 
     /**
      * 批量删除股票信息
-     * 
+     *
      * @param ids 需要删除的股票信息主键
      * @return 结果
      */
     @Override
-    public int deleteBondInfoByIds(String ids)
-    {
+    public int deleteBondInfoByIds(String ids) {
         return bondInfoMapper.deleteBondInfoByIds(Convert.toStrArray(ids));
     }
 
     /**
      * 删除股票信息信息
-     * 
+     *
      * @param id 股票信息主键
      * @return 结果
      */
     @Override
-    public int deleteBondInfoById(String id)
-    {
+    public int deleteBondInfoById(String id) {
         return bondInfoMapper.deleteBondInfoById(id);
     }
 
